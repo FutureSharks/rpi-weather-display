@@ -179,7 +179,9 @@ def create_current_image(current: dict, color: int = 255):
     return img
 
 
-def create_hourly_plot(data: list, color: int = 255, time_zone_name: str = "Europe/Berlin"):
+def create_hourly_plot(
+    data: list, color: int = 255, time_zone_name: str = "Europe/Berlin"
+):
     """
     Creates the hourly temperature and rain plots
     """
@@ -202,7 +204,7 @@ def create_hourly_plot(data: list, color: int = 255, time_zone_name: str = "Euro
     df.loc[df.rain < 0, "rain"] = 0
 
     # Create the plot
-    fig = plt.figure(figsize=(20, 8))
+    fig = plt.figure(figsize=(20, 7.7))
     ax2 = plt.subplot(211)
     plt.plot(df.index, df["temperature"], color="black", linewidth=10)
     plt.grid(color="#999999", linestyle="--", linewidth=5)

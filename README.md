@@ -10,6 +10,8 @@ Notable dependencies are:
 2. A wrapper around the OpenWeatherMap web API: [github.com/csparpa/pyowm](https://github.com/csparpa/pyowm)
 3. Weather icons: [github.com/erikflowers/weather-icons](https://github.com/erikflowers/weather-icons)
 
+There is also a CAD model of an enclosure that can be 3D printed: [enclosure.stl](enclosure.stl)
+
 ## Photos
 
 Example display image:
@@ -21,6 +23,8 @@ Photo of completed unit:
 ![complete](img/completed-1.jpg)
 
 ![complete](img/completed-2.jpg)
+
+![complete](img/completed-3.jpg)
 
 ## Install
 
@@ -35,6 +39,12 @@ Then install this tool using pip:
 
 ```console
 pip3 install https://github.com/FutureSharks/rpi-weather-display/archive/master.zip
+```
+
+And run it and it will update the e-ink display:
+
+```console
+rpi-weather-display --api-key <OMW API key>
 ```
 
 And to optionally run it via cron:

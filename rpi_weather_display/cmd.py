@@ -27,7 +27,11 @@ def main():
         "-o", "--longitude", help="Longitude.", default=13.4143556, type=float
     )
     parser.add_argument(
-        "-t", "--time-zone-name", help="Time zone name.", default="Europe/Berlin", type=str
+        "-t",
+        "--time-zone-name",
+        help="Time zone name.",
+        default="Europe/Berlin",
+        type=str,
     )
     parser.add_argument(
         "-v", "--vcom", help="E-ink display VCOM value", default=-2.48, type=float
@@ -52,7 +56,9 @@ def main():
             try:
                 c_image = create_current_image(forecast.get_current_weather())
                 d_image = create_daily_image(forecast.get_daily_data())
-                h_plot = create_hourly_plot(forecast.get_hourly_data(), time_zone_name=config.time_zone_name)
+                h_plot = create_hourly_plot(
+                    forecast.get_hourly_data(), time_zone_name=config.time_zone_name
+                )
 
                 img = create_forecast_image(
                     hourly=convert_plt_fig_to_pil(h_plot),
