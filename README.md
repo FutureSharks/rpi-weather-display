@@ -10,5 +10,7 @@ A weather display using e-ink screen and a Raspberry Pi
 
 
 ```
+apt update
+apt install python3-pandas python3-pil python3-matplotlib
 pip3 install https://github.com/FutureSharks/rpi-weather-display/archive/master.zip
 ```
