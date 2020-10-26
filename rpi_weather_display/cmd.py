@@ -2,10 +2,9 @@
 
 
 from rpi_weather_display.providers import owmWeather
-from rpi_weather_display.plot import create_hourly, create_daily, create_current_weather
-from rpi_weather_display import convert_plt_fig_to_pil, create_display_image
 from IT8951.display import AutoEPDDisplay
 from IT8951 import constants
+from rpi_weather_display import create_current_text, create_daily_text, create_hourly_plot, create_display_image, convert_plt_fig_to_pil
 import argparse
 import os
 import sys
@@ -25,14 +24,14 @@ def main():
     dims = (display.width, display.height)
     display.clear()
 
-    c_plot = create_current_weather(forecast.get_current_weather())
-    h_plot = create_hourly(forecast.get_hourly_data())
-    d_plot = create_daily(forecast.get_daily_data())
+    c_text = create_current_text(forecast.get_current_weather())
+    d_text = create_daily_text(forecast.get_daily_data())
+    h_plot = create_hourly_plot(forecast.get_hourly_data())
 
     img = create_display_image(
-        hourly=convert_plt_fig_to_pil(h_plot),
-        daily=convert_plt_fig_to_pil(d_plot),
-        current=convert_plt_fig_to_pil(c_plot),
+        hourly_plot=convert_plt_fig_to_pil(h_plot),
+        daily_text=d_text,
+        current_text=c_text,
         rotate=180,
     )
 

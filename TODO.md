@@ -5,3 +5,5 @@
 - Add `last updated` field somewhere
 - Update display in a loop
 - Add cronjob instructions
+- Display errors on screen
+- Add typed function args

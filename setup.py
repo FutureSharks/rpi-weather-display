@@ -8,9 +8,9 @@ setup(
     license="GPL v3",
     description="A weather display using e-ink screen and a Raspberry Pi",
     long_description=open("README.md", encoding="utf-8").read(),
+    include_package_data=True,
     packages=[
         "rpi_weather_display",
-        "rpi_weather_display/plot",
         "rpi_weather_display/providers",
     ],
     entry_points={
