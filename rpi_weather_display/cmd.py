@@ -5,22 +5,51 @@ import argparse
 import os
 import sys
 import time
-from rpi_weather_display import create_current_text, create_daily_text, create_hourly_plot, create_forecast_image, create_error_image, convert_plt_fig_to_pil
+from rpi_weather_display import (
+    create_current_text,
+    create_daily_text,
+    create_hourly_plot,
+    create_forecast_image,
+    create_error_image,
+    convert_plt_fig_to_pil,
+)
 from rpi_weather_display.providers import owmWeather
 from rpi_weather_display.display import eInkDisplay
 
 
 def main():
-    parser = argparse.ArgumentParser(description='A weather display using e-ink screen and a Raspberry Pi')
-    parser.add_argument('-a', '--latitude', help='Latitude', default=52.4972531, type=float)
-    parser.add_argument('-o', '--longitude', help='Longitude.', default=13.4143556, type=float)
-    parser.add_argument('-v', '--vcom', help='E-ink display VCOM value', default=-2.48, type=float)
-    parser.add_argument('-r', '--refresh', help='Refresh frequency for forecast in minutes', default=15, type=int)
-    parser.add_argument('-k', '--api-key', help='OWM API key', type=str, required=True)
-    parser.add_argument('-s', '--save-png', help='Save PNG file instead of writing to display', action='store_true', default=False)
+    parser = argparse.ArgumentParser(
+        description="A weather display using e-ink screen and a Raspberry Pi"
+    )
+    parser.add_argument(
+        "-a", "--latitude", help="Latitude", default=52.4972531, type=float
+    )
+    parser.add_argument(
+        "-o", "--longitude", help="Longitude.", default=13.4143556, type=float
+    )
+    parser.add_argument(
+        "-v", "--vcom", help="E-ink display VCOM value", default=-2.48, type=float
+    )
+    parser.add_argument(
+        "-r",
+        "--refresh",
+        help="Refresh frequency for forecast in minutes",
+        default=15,
+        type=int,
+    )
+    parser.add_argument("-k", "--api-key", help="OWM API key", type=str, required=True)
+    parser.add_argument(
+        "-s",
+        "--save-png",
+        help="Save PNG file instead of writing to display",
+        action="store_true",
+        default=False,
+    )
     config = parser.parse_args()
 
-    forecast = owmWeather(lat=config.latitude, long=config.longitude, api_key=config.api_key)
+    forecast = owmWeather(
+        lat=config.latitude, long=config.longitude, api_key=config.api_key
+    )
     display = eInkDisplay(vcom=config.vcom)
 
     try:
@@ -46,5 +75,5 @@ def main():
             time.sleep(config.refresh * 60)
 
     except KeyboardInterrupt:
-        print('Exiting')
+        print("Exiting")
         sys.exit(0)
