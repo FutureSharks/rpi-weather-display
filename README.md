@@ -39,5 +39,6 @@ pip3 install https://github.com/FutureSharks/rpi-weather-display/archive/master.
 And to optionally run it via cron:
 
 ```console
-echo -e '#!/bin/sh\npgrep rpi-weather-display || rpi-weather-display --api-key <OMW API key>' > /etc/cron.hourly/rpi-weather-display
+echo -e '#!/bin/sh\npgrep -f /usr/local/bin/rpi-weather-display > /dev/null || (rpi-weather-display --api-key <OMW API key> &)' > /etc/cron.hourly/rpi-weather-display
+chmod 0755 /etc/cron.hourly/rpi-weather-display
 ```

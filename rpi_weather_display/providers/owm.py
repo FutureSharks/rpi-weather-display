@@ -3,7 +3,7 @@ import time
 from pyowm import OWM
 from pyowm.utils import config
 from pyowm.utils import timestamps
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 logger = logging.getLogger('owmWeather')
@@ -68,7 +68,7 @@ class owmWeather(object):
         for hour in self.one_call.forecast_hourly[0:hours]:
             h = {}
 
-            h['time'] = datetime.utcfromtimestamp(hour.to_dict()['reference_time'])
+            h['time'] = datetime.utcfromtimestamp(hour.to_dict()['reference_time']).replace(tzinfo=timezone.utc).astimezone(tz=None)
             h['temperature'] = hour.temperature('celsius')['temp']
 
             if '1h' in hour.rain:
