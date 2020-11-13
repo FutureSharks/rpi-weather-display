@@ -29,7 +29,7 @@ def create_current_text(data):
     """
     Creates the text for the current weather
     """
-    data["updated_at"] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    data["last_update"] = datetime.now().strftime("%H:%M")
 
     return pretty_print_dictionary(data)
 
@@ -62,13 +62,14 @@ def create_hourly_plot(data):
     # plt.rc('font', size=20)          # controls default text sizes
     # plt.rc('axes', titlesize=SMALL_SIZE)     # fontsize of the axes title
     # plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
-    plt.rc("xtick", labelsize=20)  # fontsize of the tick labels
-    plt.rc("ytick", labelsize=20)  # fontsize of the tick labels
+    plt.rc("xtick", labelsize=30)  # fontsize of the tick labels
+    plt.rc("ytick", labelsize=30)  # fontsize of the tick labels
     # plt.rc('figure', titlesize=BIGGER_SIZE)
 
     # Resample and interpolate the DataFrame to make lines smooth
     df = df.resample("1T").asfreq()
     df = df.interpolate(method="cubic")
+    df.loc[df.rain < 0, 'rain'] = 0
 
     # Create the plot
     fig = plt.figure(figsize=(20, 8))
@@ -76,6 +77,7 @@ def create_hourly_plot(data):
     plt.plot(df.index, df["temperature"], color="black", linewidth=10)
     plt.grid(color="#999999", linestyle="--", linewidth=5)
     ax1 = plt.subplot(212)
+    ax1.set_ylim(ymin=-0.05)
     plt.plot(df.index, df["rain"], color="black", linewidth=10)
     plt.grid(color="#999999", linestyle="--", linewidth=5)
     date_form = DateFormatter("%H:%M", tz=df.index.tz)
