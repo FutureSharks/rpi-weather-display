@@ -77,7 +77,7 @@ def create_hourly_plot(data):
     plt.plot(df.index, df["temperature"], color="black", linewidth=10)
     plt.grid(color="#999999", linestyle="--", linewidth=5)
     ax1 = plt.subplot(212)
-    ax1.set_ylim(ymin=-0.05)
+    ax1.set_ylim(bottom=-0.05)
     plt.plot(df.index, df["rain"], color="black", linewidth=10)
     plt.grid(color="#999999", linestyle="--", linewidth=5)
     date_form = DateFormatter("%H:%M", tz=df.index.tz)

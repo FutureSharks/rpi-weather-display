@@ -38,13 +38,6 @@ def main():
         type=int,
     )
     parser.add_argument("-k", "--api-key", help="OWM API key", type=str, required=True)
-    parser.add_argument(
-        "-s",
-        "--save-png",
-        help="Save PNG file instead of writing to display",
-        action="store_true",
-        default=False,
-    )
     config = parser.parse_args()
 
     forecast = owmWeather(

@@ -4,53 +4,24 @@ import io
 
 
 def create_forecast_image(
-    hourly_plot,
-    daily_text,
-    current_text,
-    width=1448,
-    height=1072,
-    rotate=0,
-    font_path=None,
+    hourly: Image,
+    daily: Image,
+    current: Image,
+    width: int=1448,
+    height: int=1072,
+    rotate: int=0,
+    color: int=255,
+    font_path: str=None,
 ):
     """
     Combines the daily, hourly and current weather images and returns a PIL
     image ready to send to the display
     """
-    left_indent = 20
-    top_indent = 20
 
-    if font_path == None:
-        font_path = resource_filename("rpi_weather_display", "fonts/Roboto-Bold.ttf")
-
-    img = Image.new("L", (width, height), color=255)
-
-    # Current
-    d = ImageDraw.Draw(img)
-    d.text(
-        (left_indent, top_indent),
-        "W e a t h e r   NOW!",
-        font=ImageFont.truetype(font_path, 40),
-        fill=0,
-    )
-    d.text(
-        (left_indent, 80), current_text, font=ImageFont.truetype(font_path, 30), fill=0
-    )
-
-    # Daily
-    indent = left_indent
-    d.text(
-        (left_indent, 280),
-        "W e a t h e r   FUTURE!",
-        font=ImageFont.truetype(font_path, 40),
-        fill=0,
-    )
-    for day in daily_text:
-        d = ImageDraw.Draw(img)
-        d.text((indent, 350), day, font=ImageFont.truetype(font_path, 30), fill=0)
-        indent = indent + 200
-
-    # Hourly graph
-    img.paste(hourly_plot, (left_indent, 500))
+    img = Image.new("L", (width, height), color=color)
+    img.paste(current, (0, 0))
+    img.paste(daily, (0, 250))
+    img.paste(hourly, (0, 500))
 
     return img.rotate(rotate)
 
@@ -66,15 +37,81 @@ def convert_plt_fig_to_pil(fig):
     return img
 
 
-def create_error_image(err, width=1448, height=1072, rotate=0, font_path=None):
+def create_error_image(
+    err: Exception,
+    width: int=1448,
+    height: int=1072,
+    rotate: int=0,
+    color: int=255,
+    font_path: str=None,
+):
     """
     Formats an exception into an image to send to the display
     """
     if font_path == None:
         font_path = resource_filename("rpi_weather_display", "fonts/Roboto-Bold.ttf")
 
-    img = Image.new("L", (width, height), color=255)
+    img = Image.new("L", (width, height), color=color)
     d = ImageDraw.Draw(img)
     d.text((10, 10), str(err), font=ImageFont.truetype(font_path, 50), fill=0)
 
     return img.rotate(rotate)
+
+
+def create_daily_image(daily_text: list, font_path: str = None, color: int=255):
+    """
+    Creates the image for the daily weather
+    """
+    width=1448
+    height=300
+    left_indent = 20
+    top_indent = 20
+
+    if font_path == None:
+        font_path = resource_filename("rpi_weather_display", "fonts/Roboto-Bold.ttf")
+
+    img = Image.new("L", (width, height), color=color)
+    d = ImageDraw.Draw(img)
+
+    d.text(
+        (left_indent, top_indent),
+        "W e a t h e r   FUTURE!",
+        font=ImageFont.truetype(font_path, 40),
+        fill=0,
+    )
+
+    indent = left_indent
+    for day in daily_text:
+        d = ImageDraw.Draw(img)
+        d.text((indent, 80), day, font=ImageFont.truetype(font_path, 30), fill=0)
+        indent = indent + 200
+
+    return img
+
+
+def create_current_image(current_text: str, font_path: str = None, color: int=255):
+    """
+    Creates the image for the current weather
+    """
+    width=1448
+    height=300
+    left_indent = 20
+    top_indent = 20
+
+    if font_path == None:
+        font_path = resource_filename("rpi_weather_display", "fonts/Roboto-Bold.ttf")
+
+    img = Image.new("L", (width, height), color=color)
+
+    d = ImageDraw.Draw(img)
+    d.text(
+        (left_indent, top_indent),
+        "W e a t h e r   NOW!",
+        font=ImageFont.truetype(font_path, 40),
+        fill=0,
+    )
+    d.text(
+        (left_indent, 80), current_text, font=ImageFont.truetype(font_path, 30), fill=0
+    )
+
+    return img
