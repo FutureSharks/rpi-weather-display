@@ -32,7 +32,7 @@ def create_forecast_image(
 
     img = Image.new("L", (width, height), color=color)
     img.paste(current, (0, 0))
-    img.paste(daily, (0, 200))
+    img.paste(daily, (0, 180))
     img.paste(hourly, (0, 500))
 
     return img.rotate(rotate)
@@ -82,7 +82,7 @@ def create_daily_image(daily_data: list, color: int = 255):
     Creates the image for the daily weather
     """
     width = 1448
-    height = 300
+    height = 320
     left_indent = 20
     top_indent = 20
 
@@ -114,17 +114,17 @@ def create_daily_image(daily_data: list, color: int = 255):
             "Rain " + str(round(day["rain"], 1)) + "mm",
         ]
 
+        icon = get_b_and_white_icon(
+            "{0}/{1}@2x.png".format(icon_path, day["weather_icon_name"]), color
+        )
+        img.paste(icon, (indent - 10, 160))
+
         d.text(
             (indent, 80),
             "\n".join(text_lines),
             font=ImageFont.truetype(font_path, 30),
             fill=0,
         )
-
-        icon = get_b_and_white_icon(
-            "{0}/{1}@2x.png".format(icon_path, day["weather_icon_name"]), color
-        )
-        img.paste(icon, (indent - 10, 180))
 
         indent = indent + 200
 
@@ -136,7 +136,7 @@ def create_current_image(current: dict, color: int = 255):
     Creates the image for the current weather
     """
     width = 1448
-    height = 300
+    height = 220
     left_indent = 20
     top_indent = 20
 
@@ -161,9 +161,9 @@ def create_current_image(current: dict, color: int = 255):
     icon = get_b_and_white_icon(
         "{0}/{1}@2x.png".format(icon_path, current["weather_icon_name"]), color
     )
-    img.paste(icon, (400, 90))
+    img.paste(icon, (400, 50))
     d.text(
-        (520, 120),
+        (540, 120),
         current["description"],
         font=ImageFont.truetype(font_path, 30),
         fill=0,
@@ -182,6 +182,7 @@ def create_hourly_plot(data: list, color: int = 255):
     # Set colours and font sizes
     plt.rc("xtick", labelsize=30)  # fontsize of the tick labels
     plt.rc("ytick", labelsize=30)  # fontsize of the tick labels
+    plt.rc('axes', labelsize=30)    # fontsize of the x and y labels
     plt.rc("figure", facecolor=(color / 255,) * 3)
     plt.rc("axes", facecolor=(color / 255,) * 3)
 
@@ -195,10 +196,12 @@ def create_hourly_plot(data: list, color: int = 255):
     ax2 = plt.subplot(211)
     plt.plot(df.index, df["temperature"], color="black", linewidth=10)
     plt.grid(color="#999999", linestyle="--", linewidth=5)
+    plt.ylabel("Celcius")
     ax1 = plt.subplot(212)
     ax1.set_ylim(bottom=-0.05)
     plt.plot(df.index, df["rain"], color="black", linewidth=10)
     plt.grid(color="#999999", linestyle="--", linewidth=5)
+    plt.ylabel("Millimeter")
     date_form = DateFormatter("%H:%M", tz=df.index.tz)
     ax1.xaxis.set_major_formatter(date_form)
     ax2.xaxis.set_major_formatter(date_form)
