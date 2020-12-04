@@ -1,8 +1,6 @@
 import logging
 import time
 from pyowm import OWM
-from pyowm.utils import config
-from pyowm.utils import timestamps
 from datetime import datetime, timezone
 
 
@@ -49,6 +47,7 @@ class owmWeather(object):
             d["temperature_min"] = day.temperature("celsius")["min"]
             d["temperature_day"] = day.temperature("celsius")["day"]
             d["temperature_max"] = day.temperature("celsius")["max"]
+            d["weather_icon_name"] = day.weather_icon_name
 
             if "all" in day.rain:
                 d["rain"] = day.rain["all"]
@@ -98,6 +97,7 @@ class owmWeather(object):
                 "feels_like"
             ],
             "description": self.one_call.current.detailed_status,
+            "weather_icon_name": self.one_call.current.weather_icon_name,
         }
 
         if "1h" in self.one_call.current.rain:

@@ -2,15 +2,14 @@
 
 
 import argparse
-import os
 import sys
 import time
 from rpi_weather_display import (
-    create_current_text,
-    create_daily_text,
     create_hourly_plot,
     create_forecast_image,
     create_error_image,
+    create_current_image,
+    create_daily_image,
     convert_plt_fig_to_pil,
 )
 from rpi_weather_display.providers import owmWeather
@@ -48,20 +47,21 @@ def main():
     try:
         while True:
             try:
-                c_text = create_current_text(forecast.get_current_weather())
-                d_text = create_daily_text(forecast.get_daily_data())
+                c_image = create_current_image(forecast.get_current_weather())
+                d_image = create_daily_image(forecast.get_daily_data())
                 h_plot = create_hourly_plot(forecast.get_hourly_data())
 
                 img = create_forecast_image(
-                    hourly_plot=convert_plt_fig_to_pil(h_plot),
-                    daily_text=d_text,
-                    current_text=c_text,
+                    hourly=convert_plt_fig_to_pil(h_plot),
+                    daily=d_image,
+                    current=c_image,
                     rotate=180,
                 )
 
                 display.paste_image(img)
 
             except Exception as err:
+                print(err)
                 error_img = create_error_image(err=err, rotate=180)
                 display.paste_image(error_img)
 

@@ -1,1 +1,2 @@
 recursive-include rpi_weather_display/fonts *
+recursive-include rpi_weather_display/icons *

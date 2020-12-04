@@ -1,6 +1,4 @@
 import logging
-import time
-from datetime import datetime
 from metno_locationforecast import Place, Forecast
 
 

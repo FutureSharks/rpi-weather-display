@@ -7,7 +7,7 @@ class eInkDisplay(object):
     An object to manage the Waveshare e-ink display
     """
 
-    def __init__(self, vcom):
+    def __init__(self, vcom: float):
         self.display = AutoEPDDisplay(vcom=vcom)
         self.clear_display()
         self.dims = (self.display.width, self.display.height)
