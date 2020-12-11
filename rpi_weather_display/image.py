@@ -117,7 +117,7 @@ def create_daily_image(daily_data: list, color: int = 255):
         icon = get_b_and_white_icon(
             "{0}/{1}@2x.png".format(icon_path, day["weather_icon_name"]), color
         )
-        img.paste(icon, (indent - 10, 160))
+        img.paste(icon, (indent - 10, 173))
 
         d.text(
             (indent, 80),
@@ -166,6 +166,13 @@ def create_current_image(current: dict, color: int = 255):
         (540, 120),
         current["description"],
         font=ImageFont.truetype(font_path, 30),
+        fill=0,
+    )
+
+    d.text(
+        (1255, 18),
+        "Last updated {0}".format(datetime.now().strftime("%H:%M")),
+        font=ImageFont.truetype(font_path, 20),
         fill=0,
     )
 

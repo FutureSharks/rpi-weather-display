@@ -8,6 +8,7 @@ Notable dependencies are:
 
 1. The IT8951 driver to interface with the e-ink display: https://github.com/GregDMeyer/IT8951
 2. A wrapper around the OpenWeatherMap web API: https://github.com/csparpa/pyowm
+3. Weather icons from [erikflowers/weather-icons](https://github.com/erikflowers/weather-icons)
 
 ## Photos
 
