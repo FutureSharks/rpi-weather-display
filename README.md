@@ -6,9 +6,9 @@ The e-ink display is a Waveshare 6inch HD model with a resolution of 1448*1072: 
 
 Notable dependencies are:
 
-1. The IT8951 driver to interface with the e-ink display: https://github.com/GregDMeyer/IT8951
-2. A wrapper around the OpenWeatherMap web API: https://github.com/csparpa/pyowm
-3. Weather icons from [erikflowers/weather-icons](https://github.com/erikflowers/weather-icons)
+1. The IT8951 driver to interface with the e-ink display: [github.com/GregDMeyer/IT8951](https://github.com/GregDMeyer/IT8951)
+2. A wrapper around the OpenWeatherMap web API: [github.com/csparpa/pyowm](https://github.com/csparpa/pyowm)
+3. Weather icons: [github.com/erikflowers/weather-icons](https://github.com/erikflowers/weather-icons)
 
 ## Photos
 

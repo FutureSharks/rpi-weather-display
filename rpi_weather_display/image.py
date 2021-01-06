@@ -183,6 +183,7 @@ def create_hourly_plot(data: list, color: int = 255):
     """
     Creates the hourly temperature and rain plots
     """
+    y_top = max([d["rain"] for d in data]) + 1
     df = pd.DataFrame(data)
     df.set_index("time", inplace=True)
 
@@ -205,7 +206,7 @@ def create_hourly_plot(data: list, color: int = 255):
     plt.grid(color="#999999", linestyle="--", linewidth=5)
     plt.ylabel("Celcius")
     ax1 = plt.subplot(212)
-    ax1.set_ylim(bottom=-0.05)
+    ax1.set_ylim(bottom=-0.1, top=y_top)
     plt.plot(df.index, df["rain"], color="black", linewidth=10)
     plt.grid(color="#999999", linestyle="--", linewidth=5)
     plt.ylabel("Millimeter")
