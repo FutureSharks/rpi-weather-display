@@ -179,18 +179,20 @@ def create_current_image(current: dict, color: int = 255):
     return img
 
 
-def create_hourly_plot(data: list, color: int = 255):
+def create_hourly_plot(data: list, color: int = 255, time_zone_name: str = "Europe/Berlin"):
     """
     Creates the hourly temperature and rain plots
     """
     y_top = max([d["rain"] for d in data]) + 1
     df = pd.DataFrame(data)
-    df.set_index("time", inplace=True)
+    df["time"] = pd.to_datetime(df["time"], utc=True)
+    df["time"] = df["time"].dt.tz_convert(time_zone_name)
+    df.set_index("time", inplace=True, drop=True)
 
     # Set colours and font sizes
     plt.rc("xtick", labelsize=30)  # fontsize of the tick labels
     plt.rc("ytick", labelsize=30)  # fontsize of the tick labels
-    plt.rc('axes', labelsize=30)    # fontsize of the x and y labels
+    plt.rc("axes", labelsize=30)  # fontsize of the x and y labels
     plt.rc("figure", facecolor=(color / 255,) * 3)
     plt.rc("axes", facecolor=(color / 255,) * 3)
 

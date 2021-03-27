@@ -28,7 +28,7 @@ Install package requirements:
 
 ```console
 apt update
-apt install python3-pandas python3-pil python3-matplotlib
+apt install python3-pandas python3-pil python3-matplotlib python3-scipy
 ```
 
 Then install this tool using pip:

@@ -18,6 +18,7 @@ setup(
     },
     install_requires=[
         "pyowm==3.1.1",
+        "scipy>=1.1.0",
         "Pillow>=7.1.2",
         "pandas>=0.23",
         "matplotlib>=3.0.2",
