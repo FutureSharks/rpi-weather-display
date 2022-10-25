@@ -43,12 +43,35 @@ def main():
         default=15,
         type=int,
     )
-    parser.add_argument("-k", "--api-key", help="OWM API key", type=str, required=True)
+    parser.add_argument(
+        "-p",
+        "--provider",
+        help="Weather provider. Can be 'tomorrow' or 'openweather'.",
+        default="tomorrow",
+        type=str,
+    )
+    parser.add_argument(
+        "-k",
+        "--api-key",
+        help="Weather provider API key",
+        type=str,
+        required=True
+    )
+
     config = parser.parse_args()
 
-    forecast = owmWeather(
-        lat=config.latitude, long=config.longitude, api_key=config.api_key
-    )
+    if config.provider == "tomorrow":
+        forecast = tomorrow(
+            lat=config.latitude, long=config.longitude, api_key=config.api_key
+        )
+    elif config.provider == "openweather":
+        forecast = owmWeather(
+            lat=config.latitude, long=config.longitude, api_key=config.api_key
+        )
+    else:
+        print(f"Unknown weather provider {config.provider}")
+        sys.exit(1)
+
     display = eInkDisplay(vcom=config.vcom)
 
     try:
