@@ -11,6 +11,7 @@ class tomorrow(object):
     An interface to Tomorrow.io API
     """
     def __init__(self, lat, long, api_key):
+        self.provider_name = "Tomorrow.io"
         self.lat = lat
         self.long = long
         self.api_key = api_key

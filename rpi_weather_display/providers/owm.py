@@ -13,6 +13,7 @@ class owmWeather(object):
     """
 
     def __init__(self, lat, long, api_key):
+        self.provider_name = "OpenWeatherMap"
         self.lat = lat
         self.long = long
         self.owm = OWM(api_key)

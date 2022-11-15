@@ -131,7 +131,7 @@ def create_daily_image(daily_data: list, color: int = 255):
     return img
 
 
-def create_current_image(current: dict, color: int = 255):
+def create_current_image(current: dict, provider_name: str, color: int = 255):
     """
     Creates the image for the current weather
     """
@@ -139,6 +139,7 @@ def create_current_image(current: dict, color: int = 255):
     height = 220
     left_indent = 20
     top_indent = 20
+    update_time = datetime.now().strftime("%H:%M")
 
     img = Image.new("L", (width, height), color=color)
 
@@ -163,16 +164,17 @@ def create_current_image(current: dict, color: int = 255):
     )
     img.paste(icon, (400, 50))
     d.text(
-        (540, 120),
+        (560, 100),
         current["description"],
-        font=ImageFont.truetype(font_path, 30),
+        font=ImageFont.truetype(font_path, 50),
         fill=0,
     )
 
     d.text(
-        (1255, 18),
-        "Last updated {0}".format(datetime.now().strftime("%H:%M")),
+        (1190, 18),
+        f"Last updated {update_time} \nProvider: {provider_name}",
         font=ImageFont.truetype(font_path, 20),
+        align='right',
         fill=0,
     )
 
