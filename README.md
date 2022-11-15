@@ -12,7 +12,7 @@ Notable dependencies are:
 
 There is also a CAD model of an enclosure that can be 3D printed: [enclosure.stl](enclosure.stl)
 
-It currently supports 2 weather providers, they are both free but signup is required to get the necessary API key:
+Currently 2 weather providers are supported. They are both free but signup is required to get the necessary API key:
 
 - [openweathermap.org/api](https://openweathermap.org/api)
 - [tomorrow.io/weather-api](https://www.tomorrow.io/weather-api/)
@@ -43,7 +43,7 @@ apt install python3-pandas python3-pil python3-matplotlib python3-scipy
 Or with `pip`:
 
 ```
-pip install "pyowm==3.1.1" "scipy>=1.1.0" "Pillow>=7.1.2" "pandas>=0.23" "matplotlib>=3.0.2"
+pip install "scipy>=1.1.0" "Pillow>=7.1.2" "pandas>=0.23" "matplotlib>=3.0.2"
 ```
 
 Then install this tool using pip:

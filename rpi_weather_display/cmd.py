@@ -12,7 +12,7 @@ from rpi_weather_display import (
     create_daily_image,
     convert_plt_fig_to_pil,
 )
-from rpi_weather_display.providers import owmWeather
+from rpi_weather_display.providers import owmWeather, tomorrow
 from rpi_weather_display.display import eInkDisplay
 
 
@@ -93,7 +93,6 @@ def main():
                 display.paste_image(img)
 
             except Exception as err:
-                print(err)
                 error_img = create_error_image(err=err, rotate=180)
                 display.paste_image(error_img)
 

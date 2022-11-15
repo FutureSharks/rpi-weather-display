@@ -22,6 +22,7 @@ setup(
         "Pillow>=7.1.2",
         "pandas>=0.23",
         "matplotlib>=3.0.2",
+        "requests==2.28.1",
         "IT8951 @ git+https://github.com/GregDMeyer/IT8951@a22e39299647a9e6d6299c64ff158cc6e2a96cd1#egg=IT8951",
     ],
 )
