@@ -77,7 +77,7 @@ def main():
     try:
         while True:
             try:
-                c_image = create_current_image(forecast.get_current_weather(), config.provider)
+                c_image = create_current_image(forecast.get_current_weather(), forecast.provider_name)
                 d_image = create_daily_image(forecast.get_daily_data())
                 h_plot = create_hourly_plot(
                     forecast.get_hourly_data(), time_zone_name=config.time_zone_name
