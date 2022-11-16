@@ -33,14 +33,14 @@ Photo of completed unit:
 
 ## Install
 
-Install package requirements using `apt`:
+Install package requirements using `apt` if running on a Raspberry Pi:
 
 ```console
 apt update
 apt install python3-pandas python3-pil python3-matplotlib python3-scipy
 ```
 
-Or with `pip`:
+Or with `pip` if running on a normal computer:
 
 ```
 pip install "scipy>=1.1.0" "Pillow>=7.1.2" "pandas>=0.23" "matplotlib>=3.0.2"

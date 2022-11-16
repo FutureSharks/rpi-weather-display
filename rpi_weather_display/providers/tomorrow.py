@@ -90,7 +90,7 @@ class tomorrow(object):
         else:
             raise Exception(f"Uknown weatherCodeFullDay from Tomorrow: {weatherCode}")
 
-        icon_path = f"{code}{self._day_or_night_now()}"
+        icon_path = f"{code}d"
 
         return icon_path, description
 
