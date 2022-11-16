@@ -96,6 +96,7 @@ def main():
                 error_img = create_error_image(err=err, rotate=180)
                 display.paste_image(error_img)
 
+            print("Forecast and display successfully updated")
             time.sleep(config.refresh * 60)
 
     except KeyboardInterrupt:

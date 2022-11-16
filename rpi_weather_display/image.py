@@ -16,15 +16,15 @@ icon_path = resource_filename("rpi_weather_display", "icons")
 
 
 def create_forecast_image(
-    hourly: Image,
-    daily: Image,
-    current: Image,
-    width: int = 1448,
-    height: int = 1072,
-    rotate: int = 0,
-    color: int = 255,
-    font_path: str = None,
-):
+        hourly: Image,
+        daily: Image,
+        current: Image,
+        width: int = 1448,
+        height: int = 1072,
+        rotate: int = 0,
+        color: int = 255,
+        font_path: str = None,
+    ):
     """
     Combines the daily, hourly and current weather images and returns a PIL
     image ready to send to the display
@@ -183,8 +183,8 @@ def create_current_image(current: dict, provider_name: str, color: int = 255):
 
 
 def create_hourly_plot(
-    data: list, color: int = 255, time_zone_name: str = "Europe/Berlin"
-):
+        data: list, color: int = 255, time_zone_name: str = "Europe/Berlin"
+    ):
     """
     Creates the hourly temperature and rain plots
     """
@@ -207,7 +207,7 @@ def create_hourly_plot(
     df.loc[df.rain < 0, "rain"] = 0
 
     # Create the plot
-    fig = plt.figure(figsize=(20, 7.7))
+    fig = plt.figure(figsize=(20, 7.7), facecolor=(color / 255,) * 3)
     ax2 = plt.subplot(211)
     plt.plot(df.index, df["temperature"], color="black", linewidth=10)
     plt.grid(color="#999999", linestyle="--", linewidth=5)
