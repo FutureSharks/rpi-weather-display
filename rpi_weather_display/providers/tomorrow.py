@@ -12,6 +12,8 @@ class tomorrow(object):
     """
     def __init__(self, lat, long, api_key):
         self.provider_name = "Tomorrow.io"
+        self.cache_age = 120
+        self.last_forecast_update = 0
         self.lat = lat
         self.long = long
         self.api_key = api_key
@@ -153,25 +155,40 @@ class tomorrow(object):
 
     def update_forcast(self):
         """
-        Refreshes forecast and saves it
+        Refreshes the 3 types forecasts and saves them
         """
+        if None in [self.hourly_data, self.daily_data, self.current_data]:
+            pass
+        elif time.time() - self.last_forecast_update < self.cache_age:
+            logger.debug(f"Skipping forecast update as last update was done less than {self.cache_age} seconds ago")
+            return
+
         query_string = self.default_query_string.copy()
+
         query_string["timesteps"] = "1h"
         query_string["fields"] = ["temperature", "temperatureApparent", "rainIntensity"]
-        logger.debug("Updating forecast, getting hourly data")
+        logger.debug("Updating forecast hourly data")
         self.hourly_data = self._get_data(query_string)
 
         query_string["timesteps"] = "1d"
         query_string["fields"] = ["temperatureMin", "temperatureMax", "rainIntensity", "weatherCodeFullDay"]
-        logger.debug("Updating forecast, getting daily data")
+        logger.debug("Updating forecast daily data")
         self.daily_data = self._get_data(query_string)
+
+        query_string["timesteps"] = "current"
+        query_string["fields"] = ["temperature", "temperatureApparent", "rainIntensity", "weatherCode"]
+        logger.debug("Updating forecast current data")
+        self.current_data = self._get_data(query_string)["data"]["timelines"][0]["intervals"][0]["values"]
+
+        self.last_forecast_update = time.time()
+
+        return
 
     def get_daily_data(self, days=7):
         """
         Returns a list of daily weather data
         """
-        if self.daily_data == None:
-            self.update_forcast()
+        self.update_forcast()
 
         results = []
 
@@ -190,8 +207,7 @@ class tomorrow(object):
         """
         Returns a list of hourly rain and temperature values
         """
-        if self.hourly_data == None:
-            self.update_forcast()
+        self.update_forcast()
 
         results = []
 
@@ -208,13 +224,10 @@ class tomorrow(object):
         """
         Returns a dict of the current weather
         """
-        query_string = self.default_query_string.copy()
-        query_string["timesteps"] = "current"
-        query_string["fields"] = ["temperature", "temperatureApparent", "rainIntensity", "weatherCode"]
-        logger.debug("Updating current data")
-        self.current_data = self._get_data(query_string)["data"]["timelines"][0]["intervals"][0]["values"]
+        self.update_forcast()
 
         result = {}
+
         result["temperature"] = self.current_data["temperature"]
         result["temperature_feels_like"] = self.current_data["temperatureApparent"]
         result["weather_icon_name"], result["description"] = self._map_current_weather_icon_name(self.current_data["weatherCode"])
