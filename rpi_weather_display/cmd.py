@@ -12,7 +12,7 @@ from rpi_weather_display import (
     create_daily_image,
     convert_plt_fig_to_pil,
 )
-from rpi_weather_display.providers import owmWeather
+from rpi_weather_display.providers import owmWeather, tomorrow
 from rpi_weather_display.display import eInkDisplay
 
 
@@ -43,18 +43,41 @@ def main():
         default=15,
         type=int,
     )
-    parser.add_argument("-k", "--api-key", help="OWM API key", type=str, required=True)
+    parser.add_argument(
+        "-p",
+        "--provider",
+        help="Weather provider. Can be 'tomorrow' or 'openweather'.",
+        default="tomorrow",
+        type=str,
+    )
+    parser.add_argument(
+        "-k",
+        "--api-key",
+        help="Weather provider API key",
+        type=str,
+        required=True
+    )
+
     config = parser.parse_args()
 
-    forecast = owmWeather(
-        lat=config.latitude, long=config.longitude, api_key=config.api_key
-    )
+    if config.provider == "tomorrow":
+        forecast = tomorrow(
+            lat=config.latitude, long=config.longitude, api_key=config.api_key
+        )
+    elif config.provider == "openweather":
+        forecast = owmWeather(
+            lat=config.latitude, long=config.longitude, api_key=config.api_key
+        )
+    else:
+        print(f"Unknown weather provider {config.provider}")
+        sys.exit(1)
+
     display = eInkDisplay(vcom=config.vcom)
 
     try:
         while True:
             try:
-                c_image = create_current_image(forecast.get_current_weather())
+                c_image = create_current_image(forecast.get_current_weather(), forecast.provider_name)
                 d_image = create_daily_image(forecast.get_daily_data())
                 h_plot = create_hourly_plot(
                     forecast.get_hourly_data(), time_zone_name=config.time_zone_name
@@ -70,10 +93,10 @@ def main():
                 display.paste_image(img)
 
             except Exception as err:
-                print(err)
                 error_img = create_error_image(err=err, rotate=180)
                 display.paste_image(error_img)
 
+            print("Forecast and display successfully updated")
             time.sleep(config.refresh * 60)
 
     except KeyboardInterrupt:

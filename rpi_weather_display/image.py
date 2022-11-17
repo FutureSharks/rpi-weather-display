@@ -16,15 +16,15 @@ icon_path = resource_filename("rpi_weather_display", "icons")
 
 
 def create_forecast_image(
-    hourly: Image,
-    daily: Image,
-    current: Image,
-    width: int = 1448,
-    height: int = 1072,
-    rotate: int = 0,
-    color: int = 255,
-    font_path: str = None,
-):
+        hourly: Image,
+        daily: Image,
+        current: Image,
+        width: int = 1448,
+        height: int = 1072,
+        rotate: int = 0,
+        color: int = 255,
+        font_path: str = None,
+    ):
     """
     Combines the daily, hourly and current weather images and returns a PIL
     image ready to send to the display
@@ -60,19 +60,20 @@ def get_b_and_white_icon(path: str, gb_color: int):
 
 
 def create_error_image(
-    err: Exception,
-    width: int = 1448,
-    height: int = 1072,
-    rotate: int = 0,
-    color: int = 255,
-    font_path: str = None,
-):
+        err: Exception,
+        width: int = 1448,
+        height: int = 1072,
+        rotate: int = 0,
+        color: int = 255,
+    ):
     """
     Formats an exception into an image to send to the display
     """
     img = Image.new("L", (width, height), color=color)
     d = ImageDraw.Draw(img)
-    d.text((10, 10), str(err), font=ImageFont.truetype(font_path, 50), fill=0)
+    time_now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    error_text = f"{time_now}\n{str(err)}"
+    d.text((10, 10), error_text, font=ImageFont.truetype(font_path, 50), fill=0)
 
     return img.rotate(rotate)
 
@@ -131,7 +132,7 @@ def create_daily_image(daily_data: list, color: int = 255):
     return img
 
 
-def create_current_image(current: dict, color: int = 255):
+def create_current_image(current: dict, provider_name: str, color: int = 255):
     """
     Creates the image for the current weather
     """
@@ -139,6 +140,7 @@ def create_current_image(current: dict, color: int = 255):
     height = 220
     left_indent = 20
     top_indent = 20
+    update_time = datetime.now().strftime("%H:%M")
 
     img = Image.new("L", (width, height), color=color)
 
@@ -163,16 +165,17 @@ def create_current_image(current: dict, color: int = 255):
     )
     img.paste(icon, (400, 50))
     d.text(
-        (540, 120),
+        (560, 100),
         current["description"],
-        font=ImageFont.truetype(font_path, 30),
+        font=ImageFont.truetype(font_path, 50),
         fill=0,
     )
 
     d.text(
-        (1255, 18),
-        "Last updated {0}".format(datetime.now().strftime("%H:%M")),
+        (1190, 18),
+        f"Last updated {update_time} \nProvider: {provider_name}",
         font=ImageFont.truetype(font_path, 20),
+        align='right',
         fill=0,
     )
 
@@ -180,8 +183,8 @@ def create_current_image(current: dict, color: int = 255):
 
 
 def create_hourly_plot(
-    data: list, color: int = 255, time_zone_name: str = "Europe/Berlin"
-):
+        data: list, color: int = 255, time_zone_name: str = "Europe/Berlin"
+    ):
     """
     Creates the hourly temperature and rain plots
     """
@@ -204,7 +207,7 @@ def create_hourly_plot(
     df.loc[df.rain < 0, "rain"] = 0
 
     # Create the plot
-    fig = plt.figure(figsize=(20, 7.7))
+    fig = plt.figure(figsize=(20, 7.7), facecolor=(color / 255,) * 3)
     ax2 = plt.subplot(211)
     plt.plot(df.index, df["temperature"], color="black", linewidth=10)
     plt.grid(color="#999999", linestyle="--", linewidth=5)
