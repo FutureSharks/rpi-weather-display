@@ -4,6 +4,7 @@
 import argparse
 import sys
 import time
+import traceback
 from rpi_weather_display import (
     create_hourly_plot,
     create_forecast_image,
@@ -92,9 +93,11 @@ def main():
 
                 display.paste_image(img)
 
-            except Exception as err:
-                error_img = create_error_image(err=err, rotate=180)
+            except Exception:
+                error_img = create_error_image(error_text=traceback.format_exc(), rotate=180)
                 display.paste_image(error_img)
+                time.sleep(300)
+                continue
 
             print("Forecast and display successfully updated")
             time.sleep(config.refresh * 60)

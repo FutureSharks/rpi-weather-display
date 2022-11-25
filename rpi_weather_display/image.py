@@ -60,7 +60,7 @@ def get_b_and_white_icon(path: str, gb_color: int):
 
 
 def create_error_image(
-        err: Exception,
+        error_text: str,
         width: int = 1448,
         height: int = 1072,
         rotate: int = 0,
@@ -72,8 +72,7 @@ def create_error_image(
     img = Image.new("L", (width, height), color=color)
     d = ImageDraw.Draw(img)
     time_now = datetime.now().strftime("%Y-%m-%d %H:%M")
-    error_text = f"{time_now}\n{str(err)}"
-    d.text((10, 10), error_text, font=ImageFont.truetype(font_path, 50), fill=0)
+    d.text((10, 10), f"{time_now}\n{error_text}", font=ImageFont.truetype(font_path, 50), fill=0)
 
     return img.rotate(rotate)
 
