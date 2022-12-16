@@ -37,7 +37,7 @@ Install package requirements using `apt` if running on a Raspberry Pi:
 
 ```console
 apt update
-apt install python3-pandas python3-pil python3-matplotlib python3-scipy
+apt install python3-pandas python3-pil python3-matplotlib python3-scipy python3-pip
 ```
 
 Or with `pip` if running on a normal computer:
