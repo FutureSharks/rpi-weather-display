@@ -198,7 +198,7 @@ class tomorrow(object):
             d["temperature_min"] = day["values"]["temperatureMin"]
             d["temperature_max"] = day["values"]["temperatureMax"]
             d["weather_icon_name"] = self._map_daily_weather_icon_name(day["values"]["weatherCodeFullDay"])[0]
-            d["rain"] = day["values"]["rainIntensity"]
+            d["rain"] = day["values"].get("rainIntensity", 0)
             results.append(d)
 
         return results
@@ -215,7 +215,7 @@ class tomorrow(object):
             h = {}
             h["time"] = datetime.strptime(hour["startTime"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc).astimezone(tz=None)
             h["temperature"] = hour["values"]["temperature"]
-            h["rain"] = hour["values"]["rainIntensity"]
+            h["rain"] = hour["values"].get("rainIntensity", 0)
             results.append(h)
 
         return results
@@ -231,6 +231,6 @@ class tomorrow(object):
         result["temperature"] = self.current_data["temperature"]
         result["temperature_feels_like"] = self.current_data["temperatureApparent"]
         result["weather_icon_name"], result["description"] = self._map_current_weather_icon_name(self.current_data["weatherCode"])
-        result["rain"] = self.current_data["rainIntensity"]
+        result["rain"] = self.current_data.get("rainIntensity", 0)
 
         return result
