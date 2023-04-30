@@ -72,7 +72,7 @@ def create_error_image(
     img = Image.new("L", (width, height), color=color)
     d = ImageDraw.Draw(img)
     time_now = datetime.now().strftime("%Y-%m-%d %H:%M")
-    d.text((10, 10), f"{time_now}\n{error_text}", font=ImageFont.truetype(font_path, 50), fill=0)
+    d.text((10, 10), f"{time_now}\n{error_text}", font=ImageFont.truetype(font_path, 30), fill=0)
 
     return img.rotate(rotate)
 
