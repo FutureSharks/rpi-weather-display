@@ -75,9 +75,9 @@ class tomorrow(object):
             code, description = ("02", "Partly Cloudy")
         elif weatherCode in [1101, 2101, 2102, 2103]:
             code, description = ("03", "Mostly Cloudy")
-        elif weatherCode in [1102, 2106]:
+        elif weatherCode in [1102, 2106, 1001]:
             code, description = ("04", "Cloudy")
-        elif weatherCode in [1001, 4204, 4203, 4205, 4000, 4200,4213, 4214, 4215, 4209, 4208, 4210]:
+        elif weatherCode in [4204, 4203, 4205, 4000, 4200,4213, 4214, 4215, 4209, 4208, 4210]:
             code, description = ("09", "Light Rain")
         elif weatherCode in [4001, 4211, 4202, 4212, 4201, 6000, 6003, 6002, 6004, 6204, 6206, 6205, 6203, 6209, 6200, 6213, 6214, 6215, 6001, 6212, 6220, 6222, 6207, 6202, 6208, 6201]:
             code, description = ("10", "Heavy Rain")
