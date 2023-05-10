@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name="rpi-weather-display",
-    version="1.0",
+    version="1.1",
     url="https://github.com/FutureSharks/rpi-weather-display",
     license="GPL v3",
     description="A weather display using e-ink screen and a Raspberry Pi",
