@@ -35,7 +35,7 @@ def main():
         type=str,
     )
     parser.add_argument(
-        "-v", "--vcom", help="E-ink display VCOM value", default=-2.48, type=float
+        "-v", "--vcom", help="E-ink display VCOM value", default=-2.89, type=float
     )
     parser.add_argument(
         "-r",

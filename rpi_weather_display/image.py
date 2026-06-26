@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import io
 from PIL import Image, ImageDraw, ImageFont
 from pkg_resources import resource_filename
@@ -34,6 +35,11 @@ def create_forecast_image(
     img.paste(current, (0, 0))
     img.paste(daily, (0, 180))
     img.paste(hourly, (0, 500))
+
+    # Draw separator lines between sections
+    d = ImageDraw.Draw(img)
+    d.line([(0, 178), (width, 178)], fill=0, width=3)
+    d.line([(0, 498), (width, 498)], fill=0, width=3)
 
     return img.rotate(rotate)
 
@@ -84,49 +90,65 @@ def create_daily_image(daily_data: list, color: int = 255):
     width = 1448
     height = 320
     left_indent = 20
-    top_indent = 20
+    top_indent = 15
 
     img = Image.new("L", (width, height), color=color)
     d = ImageDraw.Draw(img)
 
+    # Section title
     d.text(
         (left_indent, top_indent),
-        "W e a t h e r   FUTURE",
-        font=ImageFont.truetype(font_path, 40),
+        "FORECAST",
+        font=ImageFont.truetype(font_path, 32),
         fill=0,
     )
 
-    indent = left_indent
-    for day in daily_data:
-        d = ImageDraw.Draw(img)
+    col_width = 200
+    icon_size = 100  # icons are 100x100 at @2x
+
+    for i, day in enumerate(daily_data):
+        x = left_indent + i * col_width
+
+        # Vertical divider between days (skip before first)
+        if i > 0:
+            d.line([(x - 10, 60), (x - 10, height - 20)], fill=180, width=2)
 
         if day["time"].date() == datetime.today().date():
             day_name = "Today"
         else:
-            day_name = day["time"].strftime("%A")
+            day_name = day["time"].strftime("%a")
 
-        text_lines = [
-            day_name,
-            str(round(day["temperature_max"]))
-            + "° / "
-            + str(round(day["temperature_min"]))
-            + "°",
-            "Rain " + str(round(day["rain"], 1)) + "mm",
-        ]
-
-        icon = get_b_and_white_icon(
-            "{0}/{1}@2x.png".format(icon_path, day["weather_icon_name"]), color
-        )
-        img.paste(icon, (indent - 10, 173))
-
+        # Day name
         d.text(
-            (indent, 80),
-            "\n".join(text_lines),
-            font=ImageFont.truetype(font_path, 30),
+            (x, 62),
+            day_name,
+            font=ImageFont.truetype(font_path, 28),
             fill=0,
         )
 
-        indent = indent + 200
+        # Temp max / min
+        d.text(
+            (x, 98),
+            f"{round(day['temperature_max'])}° / {round(day['temperature_min'])}°",
+            font=ImageFont.truetype(font_path, 26),
+            fill=0,
+        )
+
+        # Rain
+        rain_val = round(day["rain"], 1)
+        d.text(
+            (x, 132),
+            f"{rain_val} mm",
+            font=ImageFont.truetype(font_path, 24),
+            fill=80,
+        )
+
+        # Icon — centred within the column
+        icon = get_b_and_white_icon(
+            "{0}/{1}@2x.png".format(icon_path, day["weather_icon_name"]), color
+        )
+        icon_x = x + (col_width - icon_size) // 2 - 10
+        img.paste(icon, (icon_x, 195))
 
     return img
 
@@ -136,46 +158,71 @@ def create_current_image(current: dict, provider_name: str, color: int = 255):
     Creates the image for the current weather
     """
     width = 1448
-    height = 220
-    left_indent = 20
-    top_indent = 20
+    height = 180
+    margin = 28
     update_time = datetime.now().strftime("%H:%M")
 
     img = Image.new("L", (width, height), color=color)
-
-    text_lines = [
-        "Temperature   " + str(round(current["temperature"], 1)) + "°",
-        "Feels like        " + str(round(current["temperature_feels_like"], 1)) + "°",
-        "Rain                   " + str(round(current["rain"], 1)) + "mm",
-    ]
-    text = "\n".join(text_lines)
-
     d = ImageDraw.Draw(img)
+
+    # ── Left block: section label + detail rows ──────────────────────────────
     d.text(
-        (left_indent, top_indent),
-        "W e a t h e r   NOW",
-        font=ImageFont.truetype(font_path, 40),
+        (margin, 12),
+        "NOW",
+        font=ImageFont.truetype(font_path, 26),
+        fill=80,
+    )
+
+    # Hero temperature
+    temp_str = f"{round(current['temperature'], 1)}°"
+    d.text(
+        (margin, 40),
+        temp_str,
+        font=ImageFont.truetype(font_path, 80),
         fill=0,
     )
-    d.text((left_indent, 80), text, font=ImageFont.truetype(font_path, 30), fill=0)
 
+    # Feels-like + rain as smaller detail below hero
+    detail_x = margin + 200
+    d.text(
+        (detail_x, 52),
+        f"Feels like  {round(current['temperature_feels_like'], 1)}°",
+        font=ImageFont.truetype(font_path, 28),
+        fill=0,
+    )
+    d.text(
+        (detail_x, 92),
+        f"Rain           {round(current['rain'], 1)} mm",
+        font=ImageFont.truetype(font_path, 28),
+        fill=0,
+    )
+
+    # ── Centre block: icon + description ────────────────────────────────────
     icon = get_b_and_white_icon(
         "{0}/{1}@2x.png".format(icon_path, current["weather_icon_name"]), color
     )
-    img.paste(icon, (400, 50))
+    icon_x = 620
+    img.paste(icon, (icon_x, 38))
+
     d.text(
-        (560, 100),
+        (icon_x + 115, 62),
         current["description"],
-        font=ImageFont.truetype(font_path, 50),
+        font=ImageFont.truetype(font_path, 44),
         fill=0,
     )
 
+    # ── Right block: last-updated / provider ────────────────────────────────
     d.text(
-        (1190, 18),
-        f"Last updated {update_time} \nProvider: {provider_name}",
-        font=ImageFont.truetype(font_path, 20),
-        align='right',
-        fill=0,
+        (width - margin - 260, 12),
+        f"Updated {update_time}",
+        font=ImageFont.truetype(font_path, 22),
+        fill=100,
+    )
+    d.text(
+        (width - margin - 260, 40),
+        provider_name,
+        font=ImageFont.truetype(font_path, 22),
+        fill=100,
     )
 
     return img
@@ -193,40 +240,59 @@ def create_hourly_plot(
     df["time"] = df["time"].dt.tz_convert(time_zone_name)
     df.set_index("time", inplace=True, drop=True)
 
-    # Set colours and font sizes
-    plt.rc("xtick", labelsize=30)  # fontsize of the tick labels
-    plt.rc("ytick", labelsize=30)  # fontsize of the tick labels
-    plt.rc("axes", labelsize=30)  # fontsize of the x and y labels
-    plt.rc("figure", facecolor=(color / 255,) * 3)
-    plt.rc("axes", facecolor=(color / 255,) * 3)
+    bg = (color / 255,) * 3
+
+    # Set font sizes
+    plt.rc("xtick", labelsize=22)
+    plt.rc("ytick", labelsize=22)
+    plt.rc("axes", labelsize=24)
+    plt.rc("figure", facecolor=bg)
+    plt.rc("axes", facecolor=bg)
 
     # Resample and interpolate the DataFrame to make lines smooth
     df = df.resample("1T").asfreq()
     df = df.interpolate(method="cubic")
     df.loc[df.rain < 0, "rain"] = 0
 
-    # Create the plot
-    fig = plt.figure(figsize=(20, 7.7), facecolor=(color / 255,) * 3)
-    ax2 = plt.subplot(211)
-    plt.plot(df.index, df["temperature"], color="black", linewidth=10)
-    plt.grid(color="#999999", linestyle="--", linewidth=5)
-    plt.ylabel("Celcius")
-    ax1 = plt.subplot(212)
-    ax1.set_ylim(bottom=-0.1, top=y_top)
-    plt.plot(df.index, df["rain"], color="black", linewidth=10)
-    plt.grid(color="#999999", linestyle="--", linewidth=5)
-    plt.ylabel("Millimeter")
     date_form = DateFormatter("%H:%M", tz=df.index.tz)
-    ax1.xaxis.set_major_formatter(date_form)
-    ax2.xaxis.set_major_formatter(date_form)
+    grid_kw = dict(color="#cccccc", linestyle="--", linewidth=2)
 
-    for axis in ["bottom", "left"]:
-        ax1.spines[axis].set_linewidth(3)
-        ax2.spines[axis].set_linewidth(3)
+    fig, (ax_temp, ax_rain) = plt.subplots(
+        2, 1,
+        figsize=(20, 7.7),
+        facecolor=bg,
+        gridspec_kw={"hspace": 0.45},
+    )
 
-    for axis in ["top", "right"]:
-        ax1.spines[axis].set_linewidth(0)
-        ax2.spines[axis].set_linewidth(0)
+    # ── Temperature subplot ──────────────────────────────────────────────────
+    ax_temp.plot(df.index, df["temperature"], color="black", linewidth=3)
+    ax_temp.fill_between(df.index, df["temperature"], df["temperature"].min() - 0.5,
+                         color="black", alpha=0.08)
+    ax_temp.set_ylabel("°C", labelpad=6)
+    ax_temp.grid(**grid_kw)
+    ax_temp.xaxis.set_major_formatter(date_form)
+    ax_temp.yaxis.set_major_locator(ticker.MaxNLocator(integer=True, nbins=4))
+
+    for spine in ["top", "right"]:
+        ax_temp.spines[spine].set_visible(False)
+    for spine in ["bottom", "left"]:
+        ax_temp.spines[spine].set_linewidth(1.5)
+        ax_temp.spines[spine].set_color("#888888")
+
+    # ── Rain subplot ─────────────────────────────────────────────────────────
+    ax_rain.plot(df.index, df["rain"], color="black", linewidth=3)
+    ax_rain.fill_between(df.index, df["rain"], 0, color="black", alpha=0.08)
+    ax_rain.set_ylim(bottom=-0.05, top=y_top)
+    ax_rain.set_ylabel("mm", labelpad=6)
+    ax_rain.grid(**grid_kw)
+    ax_rain.xaxis.set_major_formatter(date_form)
+    ax_rain.yaxis.set_major_locator(ticker.MaxNLocator(nbins=4))
+
+    for spine in ["top", "right"]:
+        ax_rain.spines[spine].set_visible(False)
+    for spine in ["bottom", "left"]:
+        ax_rain.spines[spine].set_linewidth(1.5)
+        ax_rain.spines[spine].set_color("#888888")
 
     fig.tight_layout()
 

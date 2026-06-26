@@ -37,19 +37,24 @@ Install package requirements using `apt` if running on a Raspberry Pi:
 
 ```console
 apt update
-apt install python3-pandas python3-pil python3-matplotlib python3-scipy python3-pip
+apt install python3-pandas python3-pil python3-matplotlib python3-scipy python3-pip git pyenv
 ```
 
-Or with `pip` if running on a normal computer:
+Since the `IT8951` module is old and not compatible with the latest versions of Pythong, we need to use pyenv to install Python 3.11:
 
-```
-pip install "scipy>=1.1.0" "Pillow>=7.1.2" "pandas>=0.23" "matplotlib>=3.0.2"
+
+```bash
+export TMPDIR=/root/tmp
+pyenv install 3.11
+source .venv/bin/activate
+pip3 install --break-system-packages https://github.com/FutureSharks/rpi-weather-display/archive/master.zip
 ```
 
-Then install this tool using pip:
+ Then install this tool using pip:
 
 ```console
-pip3 install https://github.com/FutureSharks/rpi-weather-display/archive/master.zip
+pip3 install --break-system-packages https://github.com/GregDMeyer/IT8951/archive/9f136139378f74e17d9972d7165dc6ae53a2568e.zip
+pip3 install --break-system-packages https://github.com/FutureSharks/rpi-weather-display/archive/master.zip
 ```
 
 And run it and it will update the e-ink display:
@@ -61,6 +66,5 @@ rpi-weather-display --api-key <OMW API key>
 And to optionally run it via cron:
 
 ```console
-echo -e '#!/bin/sh\npgrep -f /usr/local/bin/rpi-weather-display > /dev/null || (rpi-weather-display --api-key <API key> &)' > /etc/cron.hourly/rpi-weather-display
-chmod 0755 /etc/cron.hourly/rpi-weather-display
+echo "/5 * * * * root pgrep rpi-weather-display > /dev/null || rpi-weather-display --api-key <API key> &" > /etc/cron.d/rpi-weather-display-start
 ```
