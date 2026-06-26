@@ -17,12 +17,12 @@ setup(
         "console_scripts": ["rpi-weather-display=rpi_weather_display.cmd:main"],
     },
     install_requires=[
-        "pyowm==3.1.1",
+        "pyowm",
         "scipy>=1.1.0",
         "Pillow>=7.1.2",
         "pandas>=0.23",
         "matplotlib>=3.0.2",
-        "requests==2.28.1",
+        "requests",
         "IT8951",
     ],
 )
