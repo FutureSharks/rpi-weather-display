@@ -201,7 +201,7 @@ def create_hourly_plot(
     plt.rc("axes", facecolor=(color / 255,) * 3)
 
     # Resample and interpolate the DataFrame to make lines smooth
-    df = df.resample("1T").asfreq()
+    df = df.resample("1min").asfreq()
     df = df.interpolate(method="cubic")
     df.loc[df.rain < 0, "rain"] = 0
 

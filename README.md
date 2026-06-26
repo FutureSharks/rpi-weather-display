@@ -33,31 +33,22 @@ Photo of completed unit:
 
 ## Install
 
+Enable the SPI interface with `raspi-config`.
+
 Install package requirements using `apt` if running on a Raspberry Pi:
 
 ```console
 apt update
-apt install python3-pandas python3-pil python3-matplotlib python3-scipy python3-pip git pyenv
+apt install python3-pandas python3-pil python3-matplotlib python3-scipy python3-pip python3-setuptools git
 ```
 
-Since the `IT8951` module is old and not compatible with the latest versions of Pythong, we need to use pyenv to install Python 3.11:
-
-
-```bash
-export TMPDIR=/root/tmp
-pyenv install 3.11
-source .venv/bin/activate
-pip3 install --break-system-packages https://github.com/FutureSharks/rpi-weather-display/archive/master.zip
-```
-
- Then install this tool using pip:
+Then install this tool using pip:
 
 ```console
-pip3 install --break-system-packages https://github.com/GregDMeyer/IT8951/archive/9f136139378f74e17d9972d7165dc6ae53a2568e.zip
 pip3 install --break-system-packages https://github.com/FutureSharks/rpi-weather-display/archive/master.zip
 ```
 
-And run it and it will update the e-ink display:
+Run it and it will update the e-ink display:
 
 ```console
 rpi-weather-display --api-key <OMW API key>
