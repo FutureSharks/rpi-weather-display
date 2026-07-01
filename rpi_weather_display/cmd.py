@@ -5,6 +5,7 @@ import argparse
 import sys
 import time
 import traceback
+import matplotlib.pyplot as plt
 from rpi_weather_display import (
     create_hourly_plot,
     create_forecast_image,
@@ -77,6 +78,7 @@ def main():
 
     try:
         while True:
+            plt.close("all")
             try:
                 c_image = create_current_image(forecast.get_current_weather(), forecast.provider_name)
                 d_image = create_daily_image(forecast.get_daily_data())
@@ -92,6 +94,7 @@ def main():
                 )
 
                 display.paste_image(img)
+                plt.close(h_plot)
 
             except Exception:
                 error_img = create_error_image(error_text=traceback.format_exc(), rotate=180)
