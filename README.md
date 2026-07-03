@@ -12,10 +12,11 @@ Notable dependencies are:
 
 There is also a CAD model of an enclosure that can be 3D printed: [enclosure.stl](enclosure.stl)
 
-Currently 2 weather providers are supported. They are both free but signup is required to get the necessary API key:
+Currently 3 weather providers are supported:
 
-- [openweathermap.org/api](https://openweathermap.org/api)
-- [tomorrow.io/weather-api](https://www.tomorrow.io/weather-api/)
+- [openweathermap.org/api](https://openweathermap.org/api) - Free tier requires API key
+- [tomorrow.io/weather-api](https://www.tomorrow.io/weather-api/) - Free tier requires API key
+- [open-meteo.com](https://open-meteo.com/) - Completely free, no API key required
 
 ## Photos
 
@@ -55,12 +56,19 @@ pip3 install https://github.com/FutureSharks/rpi-weather-display/archive/master.
 And run it and it will update the e-ink display:
 
 ```console
-rpi-weather-display --api-key <OMW API key>
+# Using Open-Meteo (no API key required)
+rpi-weather-display --provider openmeteo
+
+# Using OpenWeatherMap
+rpi-weather-display --provider openweather --api-key <YOUR_API_KEY>
+
+# Using Tomorrow.io
+rpi-weather-display --provider tomorrow --api-key <YOUR_API_KEY>
 ```
 
 And to optionally run it via cron:
 
 ```console
-echo -e '#!/bin/sh\npgrep -f /usr/local/bin/rpi-weather-display > /dev/null || (rpi-weather-display --api-key <API key> &)' > /etc/cron.hourly/rpi-weather-display
+echo -e '#!/bin/sh\npgrep -f /usr/local/bin/rpi-weather-display > /dev/null || (rpi-weather-display --provider openmeteo &)' > /etc/cron.hourly/rpi-weather-display
 chmod 0755 /etc/cron.hourly/rpi-weather-display
 ```
