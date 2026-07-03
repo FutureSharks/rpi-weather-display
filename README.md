@@ -12,10 +12,11 @@ Notable dependencies are:
 
 There is also a CAD model of an enclosure that can be 3D printed: [enclosure.stl](enclosure.stl)
 
-Currently 2 weather providers are supported. They are both free but signup is required to get the necessary API key:
+Currently 3 weather providers are supported:
 
-- [openweathermap.org/api](https://openweathermap.org/api)
-- [tomorrow.io/weather-api](https://www.tomorrow.io/weather-api/)
+- [openweathermap.org/api](https://openweathermap.org/api) - Free tier requires API key
+- [tomorrow.io/weather-api](https://www.tomorrow.io/weather-api/) - Free tier requires API key
+- [open-meteo.com](https://open-meteo.com/) - Completely free, no API key required
 
 ## Photos
 
@@ -37,30 +38,32 @@ Install package requirements using `apt` if running on a Raspberry Pi:
 
 ```console
 apt update
-apt install python3-pandas python3-pil python3-matplotlib python3-scipy python3-pip
-```
-
-Or with `pip` if running on a normal computer:
-
-```
-pip install "scipy>=1.1.0" "Pillow>=7.1.2" "pandas>=0.23" "matplotlib>=3.0.2"
+apt install python3-pandas python3-pil python3-matplotlib python3-scipy python3-pip python3-setuptools git vim
 ```
 
 Then install this tool using pip:
 
 ```console
-pip3 install https://github.com/FutureSharks/rpi-weather-display/archive/master.zip
+pip3 install --break-system-packages https://github.com/GregDMeyer/IT8951/archive/master.zip
+pip3 install --break-system-packages https://github.com/FutureSharks/rpi-weather-display/archive/master.zip
 ```
 
 And run it and it will update the e-ink display:
 
 ```console
-rpi-weather-display --api-key <OMW API key>
+# Using Open-Meteo (no API key required)
+rpi-weather-display --provider openmeteo
+
+# Using OpenWeatherMap
+rpi-weather-display --provider openweather --api-key <YOUR_API_KEY>
+
+# Using Tomorrow.io
+rpi-weather-display --provider tomorrow --api-key <YOUR_API_KEY>
 ```
 
-And to optionally run it via cron:
+Or to optionally run it as a service via `systemd` (command will need to be updated with any required arguments):
 
-```console
-echo -e '#!/bin/sh\npgrep -f /usr/local/bin/rpi-weather-display > /dev/null || (rpi-weather-display --api-key <API key> &)' > /etc/cron.hourly/rpi-weather-display
-chmod 0755 /etc/cron.hourly/rpi-weather-display
+```bash
+echo -e "[Unit]\nDescription=RPi Weather Display Service\nAfter=network.target\n\n[Service]\nExecStart=/usr/local/bin/rpi-weather-display\nRestart=always\nRestartSec=5\nUser=root\n\n[Install]\nWantedBy=multi-user.target" > /etc/systemd/system/rpi-weather-display.service
+systemctl daemon-reload && systemctl start rpi-weather-display && systemctl enable rpi-weather-display
 ```

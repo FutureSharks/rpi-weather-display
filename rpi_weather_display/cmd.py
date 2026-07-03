@@ -14,7 +14,7 @@ from rpi_weather_display import (
     create_daily_image,
     convert_plt_fig_to_pil,
 )
-from rpi_weather_display.providers import owmWeather, tomorrow
+from rpi_weather_display.providers import owmWeather, tomorrow, openmeteo
 from rpi_weather_display.display import eInkDisplay
 
 
@@ -36,7 +36,7 @@ def main():
         type=str,
     )
     parser.add_argument(
-        "-v", "--vcom", help="E-ink display VCOM value", default=-2.48, type=float
+        "-v", "--vcom", help="E-ink display VCOM value", default=-2.89, type=float
     )
     parser.add_argument(
         "-r",
@@ -48,27 +48,37 @@ def main():
     parser.add_argument(
         "-p",
         "--provider",
-        help="Weather provider. Can be 'tomorrow' or 'openweather'.",
-        default="tomorrow",
+        help="Weather provider. Can be 'tomorrow', 'openweather', or 'openmeteo'.",
+        default="openmeteo",
         type=str,
     )
     parser.add_argument(
         "-k",
         "--api-key",
-        help="Weather provider API key",
+        help="Weather provider API key (not required for 'openmeteo')",
         type=str,
-        required=True
+        required=False
     )
 
     config = parser.parse_args()
 
     if config.provider == "tomorrow":
+        if not config.api_key:
+            print("API key is required for 'tomorrow' provider")
+            sys.exit(1)
         forecast = tomorrow(
             lat=config.latitude, long=config.longitude, api_key=config.api_key
         )
     elif config.provider == "openweather":
+        if not config.api_key:
+            print("API key is required for 'openweather' provider")
+            sys.exit(1)
         forecast = owmWeather(
             lat=config.latitude, long=config.longitude, api_key=config.api_key
+        )
+    elif config.provider == "openmeteo":
+        forecast = openmeteo(
+            lat=config.latitude, long=config.longitude
         )
     else:
         print(f"Unknown weather provider {config.provider}")

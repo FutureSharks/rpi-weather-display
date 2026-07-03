@@ -2,6 +2,4 @@
 
 from .owm import owmWeather
 from .tomorrow import tomorrow
-
-# Not used
-# from .metno import metNorway
+from .openmeteo import openmeteo
