@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
@@ -254,7 +255,6 @@ def create_hourly_plot(
     df = df.interpolate(method="cubic").bfill().ffill()
     df.loc[df.rain < 0, "rain"] = 0
 
-    import numpy as np
     x = df.index
     t = np.asarray(df["temperature"].values, dtype=float)
     r = np.asarray(df["rain"].values, dtype=float)
@@ -271,6 +271,7 @@ def create_hourly_plot(
     ax_t.fill_between(x, t, np.full_like(t, float(t.min())),
                       color=(230 / 255,) * 3, zorder=0)
     ax_t.set_ylabel("Temperature °C", color=(INK_SOFT / 255,) * 3)
+    ax_t.set_xlim(left=x[0], right=x[-1])
     ax_t.set_title("NEXT 24 HOURS", loc="left", fontsize=30,
                    color=(INK_FAINT / 255,) * 3, pad=14)
     _style_axis(ax_t, color)
@@ -281,6 +282,7 @@ def create_hourly_plot(
     ax_r.fill_between(x, r, np.zeros_like(r), color=fill, zorder=1)
     ax_r.plot(x, r, color=ink, linewidth=3, solid_capstyle="round")
     ax_r.set_ylabel("Rain mm", color=(INK_SOFT / 255,) * 3)
+    ax_r.set_xlim(left=x[0], right=x[-1])
     _style_axis(ax_r, color)
 
     date_form = DateFormatter("%H:%M", tz=df.index.tz)
