@@ -114,7 +114,7 @@ def create_error_image(
         error_text: str,
         width: int = CANVAS_W,
         height: int = CANVAS_H,
-        rotate: int = 0,
+        rotate: int = 180,
         color: int = PANEL,
     ):
     """
@@ -231,16 +231,13 @@ def _style_axis(ax, color):
 
 
 def create_hourly_plot(
-        data: list, color: int = PANEL, time_zone_name: str = "Europe/Berlin"
+        df, color: int = PANEL
     ):
     """
     Creates the 24h temperature and rain plots with a clean, minimal style
     """
-    y_top = max([d["rain"] for d in data]) + 1
-    df = pd.DataFrame(data)
-    df["time"] = pd.to_datetime(df["time"], utc=True)
-    df["time"] = df["time"].dt.tz_convert(time_zone_name)
-    df.set_index("time", inplace=True, drop=True)
+    # Set top just above the max
+    y_top = df["rain"].max() + 1
 
     # Typographic defaults for the figure
     plt.rc("xtick", labelsize=24)

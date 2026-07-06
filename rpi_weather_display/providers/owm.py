@@ -2,6 +2,7 @@ import logging
 import time
 from pyowm import OWM
 from datetime import datetime, timezone
+import pandas as pd
 
 
 logger = logging.getLogger("owmWeather")
@@ -12,10 +13,11 @@ class owmWeather(object):
     An interface to OpenWeatherMap API
     """
 
-    def __init__(self, lat, long, api_key):
+    def __init__(self, lat, long, time_zone_name, api_key):
         self.provider_name = "OpenWeatherMap"
         self.lat = lat
         self.long = long
+        self.time_zone_name = time_zone_name
         self.owm = OWM(api_key)
         self.mgr = self.owm.weather_manager()
         self.update_forcast()
@@ -59,6 +61,17 @@ class owmWeather(object):
 
         return results
 
+    def _prepare_hourly_data(self, data):
+        """
+        Prepares the list of data items into a basic dataframe with TZ adjusted
+        """
+        df = pd.DataFrame(data)
+        df["time"] = pd.to_datetime(df["time"], utc=True)
+        df["time"] = df["time"].dt.tz_convert(self.time_zone_name)
+        df.set_index("time", inplace=True, drop=True)
+
+        return df
+
     def get_hourly_data(self, hours=24):
         """
         Returns a list of hourly rain and temperature values
@@ -84,7 +97,7 @@ class owmWeather(object):
 
             results.append(h)
 
-        return results
+        return self._prepare_hourly_data(results)
 
     def get_current_weather(self):
         """

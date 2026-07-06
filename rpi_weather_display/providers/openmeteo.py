@@ -2,6 +2,7 @@ import logging
 import time
 from datetime import datetime, timezone
 import requests
+import pandas as pd
 
 
 logger = logging.getLogger()
@@ -10,12 +11,13 @@ class openmeteo(object):
     """
     An interface to Open-Meteo API
     """
-    def __init__(self, lat, long, api_key=None):
+    def __init__(self, lat, long, time_zone_name, api_key=None):
         self.provider_name = "Open-Meteo"
         self.cache_age = 120
         self.last_forecast_update = 0
         self.lat = lat
         self.long = long
+        self.time_zone_name = time_zone_name
         self.api_endpoint = "https://api.open-meteo.com/v1/forecast"
         self.hourly_data = None
         self.daily_data = None
@@ -30,7 +32,7 @@ class openmeteo(object):
                 "hourly": "temperature_2m,precipitation",
                 "daily": "weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum",
                 "temperature_unit": "celsius",
-                "timezone": "auto"
+                "timezone": self.time_zone_name
             }
             response = requests.get(self.api_endpoint, params=params)
             response.raise_for_status()
@@ -113,22 +115,47 @@ class openmeteo(object):
 
         return results
 
+    def _prepare_hourly_data(self, data):
+        """
+        Prepares the list of data items into a basic dataframe
+        """
+        df = pd.DataFrame(data)
+        # Does not need TZ adjusted as it comes in local time
+        df["time"] = pd.to_datetime(df["time"])
+        df.set_index("time", inplace=True, drop=True)
+
+        return df
+
     def get_hourly_data(self, hours=24):
         """
-        Returns a list of hourly rain and temperature values
+        Returns a list of hourly rain and temperature values for the next 24 hours
         """
         self.update_forcast()
 
+        # Find the current hour index in the hourly data
+        # Because "data is returned starting at 00:00 local-time"
+        now = datetime.now()
+        current_index = 0
+        for i, time_str in enumerate(self.hourly_data["time"]):
+            hour_time = datetime.strptime(time_str, "%Y-%m-%dT%H:%M")
+            # Find the first hour at or after the current time
+            if hour_time.hour >= now.hour or (hour_time.date() > now.date()):
+                current_index = i
+                break
+        else:
+            # If no future hour found, start from the end
+            current_index = len(self.hourly_data["time"]) - hours
+
         results = []
-        for i in range(min(hours, len(self.hourly_data["time"]))):
+        for i in range(current_index, min(current_index + hours, len(self.hourly_data["time"]))):
             h = {}
             time_str = self.hourly_data["time"][i]
-            h["time"] = datetime.strptime(time_str, "%Y-%m-%dT%H:%M").replace(tzinfo=timezone.utc).astimezone(tz=None)
+            h["time"] = datetime.strptime(time_str, "%Y-%m-%dT%H:%M")
             h["temperature"] = self.hourly_data["temperature_2m"][i]
-            h["rain"] = self.hourly_data.get("precipitation", [0] * len(self.hourly_data["time"]))[i] or 0
+            h["rain"] = self.hourly_data["precipitation"][i]
             results.append(h)
 
-        return results
+        return self._prepare_hourly_data(results)
 
     def get_current_weather(self):
         """

@@ -2,6 +2,7 @@ import logging
 import time
 from datetime import datetime, timezone
 import requests
+import pandas as pd
 
 
 logger = logging.getLogger()
@@ -10,12 +11,13 @@ class tomorrow(object):
     """
     An interface to Tomorrow.io API
     """
-    def __init__(self, lat, long, api_key):
+    def __init__(self, lat, long, time_zone_name, api_key):
         self.provider_name = "Tomorrow.io"
         self.cache_age = 120
         self.last_forecast_update = 0
         self.lat = lat
         self.long = long
+        self.time_zone_name = time_zone_name
         self.api_key = api_key
         self.api_endpoint = "https://api.tomorrow.io/v4/timelines"
         self.default_query_string = {
@@ -203,6 +205,17 @@ class tomorrow(object):
 
         return results
 
+    def _prepare_hourly_data(self, data):
+        """
+        Prepares the list of data items into a basic dataframe with TZ adjusted
+        """
+        df = pd.DataFrame(data)
+        df["time"] = pd.to_datetime(df["time"], utc=True)
+        df["time"] = df["time"].dt.tz_convert(self.time_zone_name)
+        df.set_index("time", inplace=True, drop=True)
+
+        return df
+
     def get_hourly_data(self, hours=24):
         """
         Returns a list of hourly rain and temperature values
@@ -218,7 +231,7 @@ class tomorrow(object):
             h["rain"] = hour["values"].get("rainIntensity", 0)
             results.append(h)
 
-        return results
+        return self._prepare_hourly_data(results)
 
     def get_current_weather(self):
         """

@@ -67,18 +67,18 @@ def main():
             print("API key is required for 'tomorrow' provider")
             sys.exit(1)
         forecast = tomorrow(
-            lat=config.latitude, long=config.longitude, api_key=config.api_key
+            lat=config.latitude, long=config.longitude, time_zone_name=config.time_zone_name, api_key=config.api_key
         )
     elif config.provider == "openweather":
         if not config.api_key:
             print("API key is required for 'openweather' provider")
             sys.exit(1)
         forecast = owmWeather(
-            lat=config.latitude, long=config.longitude, api_key=config.api_key
+            lat=config.latitude, long=config.longitude, time_zone_name=config.time_zone_name, api_key=config.api_key
         )
     elif config.provider == "openmeteo":
         forecast = openmeteo(
-            lat=config.latitude, long=config.longitude
+            lat=config.latitude, long=config.longitude, time_zone_name="auto",
         )
     else:
         print(f"Unknown weather provider {config.provider}")
@@ -92,9 +92,7 @@ def main():
             try:
                 c_image = create_current_image(forecast.get_current_weather(), forecast.provider_name)
                 d_image = create_daily_image(forecast.get_daily_data())
-                h_plot = create_hourly_plot(
-                    forecast.get_hourly_data(), time_zone_name=config.time_zone_name
-                )
+                h_plot = create_hourly_plot(forecast.get_hourly_data())
 
                 img = create_forecast_image(
                     hourly=convert_plt_fig_to_pil(h_plot),
@@ -107,7 +105,7 @@ def main():
                 plt.close(h_plot)
 
             except Exception:
-                error_img = create_error_image(error_text=traceback.format_exc(), rotate=180)
+                error_img = create_error_image(error_text=traceback.format_exc())
                 display.paste_image(error_img)
                 time.sleep(300)
                 continue
