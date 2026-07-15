@@ -7,12 +7,11 @@ import time
 import traceback
 import matplotlib.pyplot as plt
 from rpi_weather_display import (
-    create_hourly_plot,
+    create_hourly_image,
     create_forecast_image,
     create_error_image,
     create_current_image,
     create_daily_image,
-    convert_plt_fig_to_pil,
 )
 from rpi_weather_display.providers import owmWeather, tomorrow, openmeteo
 from rpi_weather_display.display import eInkDisplay
@@ -92,10 +91,10 @@ def main():
             try:
                 c_image = create_current_image(forecast.get_current_weather(), forecast.provider_name)
                 d_image = create_daily_image(forecast.get_daily_data())
-                h_plot = create_hourly_plot(forecast.get_hourly_data())
+                h_image = create_hourly_image(forecast.get_hourly_data())
 
                 img = create_forecast_image(
-                    hourly=convert_plt_fig_to_pil(h_plot),
+                    hourly=h_image,
                     daily=d_image,
                     current=c_image,
                     rotate=180,
