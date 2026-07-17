@@ -51,8 +51,9 @@ class tomorrow(object):
         """
         Simply returns a 'd' or 'n' depending on whether it's day or night right now
         """
-        hour = datetime.now(timezone.utc).astimezone().hour
-        month = datetime.now(timezone.utc).astimezone().month
+        now = datetime.now(timezone.utc).astimezone()
+        hour = now.hour
+        month = now.month
 
         if month in [10, 11, 12, 1, 2, 3]:
             if hour in [18, 19, 20, 21, 22, 23, 0, 1, 2, 3, 4, 5, 6]:
@@ -92,9 +93,9 @@ class tomorrow(object):
         else:
             raise Exception(f"Uknown weatherCodeFullDay from Tomorrow: {weatherCode}")
 
-        icon_path = f"{code}d"
+        icon_code = f"{code}d"
 
-        return icon_path, description
+        return icon_code, description
 
     def _map_current_weather_icon_name(self, weatherCode):
         """
@@ -151,9 +152,9 @@ class tomorrow(object):
         else:
             raise Exception(f"Uknown weatherCode from Tomorrow: {weatherCode}")
 
-        icon_path = f"{code}{self._day_or_night_now()}"
+        icon_code = f"{code}{self._day_or_night_now()}"
 
-        return icon_path, description
+        return icon_code, description
 
     def update_forcast(self):
         """

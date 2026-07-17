@@ -14,9 +14,9 @@ There is also a CAD model of an enclosure that can be 3D printed: [enclosure.stl
 
 Currently 3 weather providers are supported:
 
+- [open-meteo.com](https://open-meteo.com/) - Completely free, no API key required
 - [openweathermap.org/api](https://openweathermap.org/api) - Free tier requires API key
 - [tomorrow.io/weather-api](https://www.tomorrow.io/weather-api/) - Free tier requires API key
-- [open-meteo.com](https://open-meteo.com/) - Completely free, no API key required
 
 ## Photos
 

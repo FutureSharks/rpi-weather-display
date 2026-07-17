@@ -1,3 +1,4 @@
+from functools import lru_cache
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -62,9 +63,7 @@ def _create_rotated_text(text: str, font_size: int = 30, color: int = INK):
     Returns text rotated 90 degrees
     """
     font = _font(font_size)
-    # Measure the real text width using a temporary draw surface
-    tmp = ImageDraw.Draw(Image.new("L", (1, 1)))
-    text_w = int(tmp.textlength(text, font=font))
+    text_w = int(font.getlength(text))
     img = Image.new("L", (text_w, int(font_size)), color=PANEL)
     d = ImageDraw.Draw(img)
     d.text((0, 0), text, font=font, fill=color)
@@ -99,6 +98,7 @@ def create_forecast_image(
     return img.rotate(rotate)
 
 
+@lru_cache(maxsize=None)
 def get_b_and_white_icon(path: str, gb_color: int):
     """
     Returns a PIL image of an PNG icon
@@ -223,12 +223,13 @@ def create_daily_image(daily_data: list, color: int = PANEL):
     days = 7
     usable = width - (2 * MARGIN) - 60
     col_w = usable / days
+    today = datetime.today().date()
 
     for i, day in enumerate(daily_data):
         cx = int(MARGIN + col_w * (i + 0.5)) + 48
 
 
-        if day["time"].date() == datetime.today().date():
+        if day["time"].date() == today:
             day_name = "Today"
         else:
             day_name = day["time"].strftime("%a")
