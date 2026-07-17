@@ -3,18 +3,6 @@
 
 import argparse
 import sys
-import time
-import traceback
-import matplotlib.pyplot as plt
-from rpi_weather_display import (
-    create_hourly_image,
-    create_forecast_image,
-    create_error_image,
-    create_current_image,
-    create_daily_image,
-)
-from rpi_weather_display.providers import owmWeather, tomorrow, openmeteo
-from rpi_weather_display.display import eInkDisplay
 
 
 def main():
@@ -60,6 +48,19 @@ def main():
     )
 
     config = parser.parse_args()
+
+    import time
+    import traceback
+    import matplotlib.pyplot as plt
+    from rpi_weather_display.image import (
+        create_hourly_image,
+        create_forecast_image,
+        create_error_image,
+        create_current_image,
+        create_daily_image,
+    )
+    from rpi_weather_display.providers import owmWeather, tomorrow, openmeteo
+    from rpi_weather_display.display import eInkDisplay
 
     if config.provider == "tomorrow":
         if not config.api_key:
