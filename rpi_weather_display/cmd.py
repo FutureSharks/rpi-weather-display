@@ -85,6 +85,7 @@ def main():
         sys.exit(1)
 
     display = eInkDisplay(vcom=config.vcom)
+    last_good_image = None
 
     try:
         while True:
@@ -101,11 +102,12 @@ def main():
                 )
 
                 display.paste_image(img)
+                last_good_image = img
 
                 plt.close("all")
 
             except Exception:
-                error_img = create_error_image(error_text=traceback.format_exc())
+                error_img = create_error_image(error_text=traceback.format_exc(), base=last_good_image)
                 display.paste_image(error_img)
                 print(f"Error: {traceback.format_exc()}")
                 time.sleep(300)

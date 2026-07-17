@@ -4,14 +4,16 @@ Render a preview PNG of the display image using mock data, without any e-ink
 hardware. Useful for iterating on the layout in rpi_weather_display/image.py.
 
 Usage:
-    python3 preview.py            # writes preview.png next to this script
-    python3 preview.py out.png    # writes to a custom path
+    python3 preview.py                  # writes preview.png next to this script
+    python3 preview.py out.png          # writes to a custom path
+    python3 preview.py --error          # writes preview.png with an error overlay
+    python3 preview.py --error out.png  # writes to a custom path with an error overlay
 """
 
+import argparse
 import math
 import os
 import random
-import sys
 from datetime import datetime, timedelta
 
 import pandas as pd
@@ -23,6 +25,7 @@ from rpi_weather_display.image import (
     create_daily_image,
     create_hourly_image,
     create_forecast_image,
+    create_error_image,
 )
 
 
@@ -68,7 +71,16 @@ def mock_data():
 
 
 def main():
-    out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("out", nargs="?", help="Output path for the preview PNG")
+    parser.add_argument(
+        "--error",
+        action="store_true",
+        help="Overlay a mock error onto the hourly-plot band, as shown when a forecast update fails",
+    )
+    args = parser.parse_args()
+
+    out = args.out or os.path.join(
         os.path.dirname(os.path.abspath(__file__)), "preview.png"
     )
     current, daily, hourly = mock_data()
@@ -84,6 +96,14 @@ def main():
         current=create_current_image(current, "Tomorrow.io"),
         rotate=0,
     )
+
+    if args.error:
+        img = create_error_image(
+            error_text="Traceback (most recent call last):\nConnectionError: timed out",
+            base=img,
+            rotate=0,
+        )
+
     img.save(out)
     print(f"Saved {out} ({img.size[0]}x{img.size[1]}, mode {img.mode})")
 

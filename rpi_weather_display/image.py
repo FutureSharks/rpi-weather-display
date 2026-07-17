@@ -57,9 +57,9 @@ def _draw_centered(d: ImageDraw.ImageDraw, cx: int, y: int, text: str, font, fil
     d.text((cx - _text_w(d, text, font) / 2, y), text, font=font, fill=fill)
 
 
-def _create_rotated_text(text: str, font_size: int = 30, color: int = INK, rotate: int = 90):
+def _create_rotated_text(text: str, font_size: int = 30, color: int = INK):
     """
-    Returns rotated text
+    Returns text rotated 90 degrees
     """
     font = _font(font_size)
     # Measure the real text width using a temporary draw surface
@@ -68,7 +68,7 @@ def _create_rotated_text(text: str, font_size: int = 30, color: int = INK, rotat
     img = Image.new("L", (text_w, int(font_size)), color=PANEL)
     d = ImageDraw.Draw(img)
     d.text((0, 0), text, font=font, fill=color)
-    img = img.rotate(rotate, expand=1)
+    img = img.rotate(90, expand=1)
     return img
 
 
@@ -111,22 +111,42 @@ def get_b_and_white_icon(path: str, gb_color: int):
 
 def create_error_image(
         error_text: str,
+        base: Image = None,
         width: int = CANVAS_W,
         height: int = CANVAS_H,
         rotate: int = 180,
         color: int = PANEL,
     ):
     """
-    Formats an exception into an image to send to the display
+    Formats an exception into an image to send to the display. If `base` is
+    given (the last successfully rendered, already-rotated frame), the error
+    is painted as a panel over the hourly-plot band instead of replacing the
+    whole screen, so the current temperature and daily forecast stay
+    readable.
     """
-    img = Image.new("L", (width, height), color=color)
-    d = ImageDraw.Draw(img)
-    time_now = datetime.now().strftime("%Y-%m-%d %H:%M")
-    d.text((MARGIN, MARGIN), "Something went wrong", font=_font(44), fill=INK)
-    d.text((MARGIN, MARGIN + 70), time_now, font=_font(28), fill=INK_SOFT)
-    d.text((MARGIN, MARGIN + 130), error_text, font=_font(22), fill=INK)
+    if base is not None:
+        img = base.copy()
+        # `base` is already rotated for display, so the hourly band (bottom
+        # of the pre-rotation layout) ends up at the top of the screen once
+        # rotated 180 degrees.
+        if rotate == 180:
+            box = (0, 0, width, PLOT_H)
+        else:
+            box = (0, PLOT_Y, width, height)
+    else:
+        img = Image.new("L", (width, height), color=color)
+        box = (0, 0, width, height)
 
-    return img.rotate(rotate)
+    d = ImageDraw.Draw(img)
+
+    text_x = box[0] + MARGIN + 240
+    text_y = box[1] + MARGIN
+    time_now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    d.text((text_x, text_y), "Something went wrong", font=_font(44), fill=INK)
+    d.text((text_x, text_y + 70), time_now, font=_font(28), fill=INK_SOFT)
+    d.text((text_x, text_y + 130), error_text, font=_font(22), fill=INK)
+
+    return img if base is not None else img.rotate(rotate)
 
 
 def create_current_image(current: dict, provider_name: str, color: int = PANEL):
@@ -140,7 +160,7 @@ def create_current_image(current: dict, provider_name: str, color: int = PANEL):
 
     img = Image.new("L", (width, height), color=color)
     d = ImageDraw.Draw(img)
-    img.paste(_create_rotated_text("NOW", font_size=26, color=INK_FAINT, rotate=90), (MARGIN - 20, MARGIN))
+    img.paste(_create_rotated_text("NOW", font_size=26, color=INK_FAINT), (MARGIN - 20, MARGIN))
 
     # Temperatures, laid out left-to-right so each piece starts right after
     # the actual measured width of the one before it (rather than fixed
@@ -198,7 +218,7 @@ def create_daily_image(daily_data: list, color: int = PANEL):
 
     img = Image.new("L", (width, height), color=color)
     d = ImageDraw.Draw(img)
-    img.paste(_create_rotated_text("NEXT 7 DAYS", font_size=26, color=INK_FAINT, rotate=90), (MARGIN - 20, MARGIN))
+    img.paste(_create_rotated_text("NEXT 7 DAYS", font_size=26, color=INK_FAINT), (MARGIN - 20, MARGIN))
 
     days = 7
     usable = width - (2 * MARGIN) - 60
@@ -322,6 +342,6 @@ def create_hourly_image(
 
     # Add labels for the plots
     d = ImageDraw.Draw(img)
-    img.paste(_create_rotated_text("NEXT 24 HOURS", font_size=26, color=INK_FAINT, rotate=90), (MARGIN - 20, MARGIN))
+    img.paste(_create_rotated_text("NEXT 24 HOURS", font_size=26, color=INK_FAINT), (MARGIN - 20, MARGIN))
 
     return img
