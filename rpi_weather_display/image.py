@@ -93,8 +93,8 @@ def create_forecast_image(
 
     # Hairline dividers between the three bands
     d = ImageDraw.Draw(img)
-    d.line([(MARGIN, DAILY_Y - 4), (width - MARGIN, DAILY_Y - 4)], fill=RULE, width=2)
-    d.line([(MARGIN, PLOT_Y - 4), (width - MARGIN, PLOT_Y - 4)], fill=RULE, width=2)
+    d.line([(MARGIN + 20, DAILY_Y - 4), (width - MARGIN - 20, DAILY_Y - 4)], fill=RULE, width=2)
+    d.line([(MARGIN + 20, PLOT_Y - 4), (width - MARGIN - 20, PLOT_Y - 4)], fill=RULE, width=2)
 
     return img.rotate(rotate)
 
@@ -140,7 +140,7 @@ def create_current_image(current: dict, provider_name: str, color: int = PANEL):
 
     img = Image.new("L", (width, height), color=color)
     d = ImageDraw.Draw(img)
-    img.paste(_create_rotated_text("NOW", font_size=30, color=INK_FAINT, rotate=90), (MARGIN, MARGIN))
+    img.paste(_create_rotated_text("NOW", font_size=26, color=INK_FAINT, rotate=90), (MARGIN - 20, MARGIN))
 
     # Temperatures, laid out left-to-right so each piece starts right after
     # the actual measured width of the one before it (rather than fixed
@@ -173,8 +173,8 @@ def create_current_image(current: dict, provider_name: str, color: int = PANEL):
     icon = get_b_and_white_icon(
         "{0}/{1}@2x.png".format(icon_path, current["weather_icon_name"]), color
     )
-    icon_larger = icon.resize(size=(210, 210))
-    img.paste(icon_larger, (icon_x, 0))
+    icon_larger = icon.resize(size=(180, 180))
+    img.paste(icon_larger, (icon_x, 15))
 
     if current["rain"] > 0:
         rain_text = f"{round(current['rain'], 1)} mm rain"
@@ -183,7 +183,7 @@ def create_current_image(current: dict, provider_name: str, color: int = PANEL):
     d.text((icon_x + 210, 60), f"{current['description']}\n{rain_text}", font=_font(40), fill=INK_SOFT)
 
     # Right-hand meta block
-    d.multiline_text((CANVAS_W - MARGIN, 70), f"Updated {update_time}\nvia {provider_name}", font=_font(24), fill=INK_SOFT, align="right", anchor="ra")
+    d.multiline_text((CANVAS_W - MARGIN, MARGIN), f"Updated {update_time}\nvia {provider_name}", font=_font(24), fill=INK_SOFT, align="right", anchor="ra")
 
     return img
 
@@ -198,14 +198,14 @@ def create_daily_image(daily_data: list, color: int = PANEL):
 
     img = Image.new("L", (width, height), color=color)
     d = ImageDraw.Draw(img)
-    img.paste(_create_rotated_text("NEXT 7 DAYS", font_size=30, color=INK_FAINT, rotate=90), (MARGIN, MARGIN))
+    img.paste(_create_rotated_text("NEXT 7 DAYS", font_size=26, color=INK_FAINT, rotate=90), (MARGIN - 20, MARGIN))
 
     days = 7
     usable = width - (2 * MARGIN) - 60
     col_w = usable / days
 
     for i, day in enumerate(daily_data):
-        cx = int(MARGIN + col_w * (i + 0.5)) + 70
+        cx = int(MARGIN + col_w * (i + 0.5)) + 48
 
 
         if day["time"].date() == datetime.today().date():
@@ -322,6 +322,6 @@ def create_hourly_image(
 
     # Add labels for the plots
     d = ImageDraw.Draw(img)
-    img.paste(_create_rotated_text("NEXT 24 HOURS", font_size=30, color=INK_FAINT, rotate=90), (MARGIN, MARGIN))
+    img.paste(_create_rotated_text("NEXT 24 HOURS", font_size=26, color=INK_FAINT, rotate=90), (MARGIN - 20, MARGIN))
 
     return img

@@ -87,7 +87,6 @@ def main():
 
     try:
         while True:
-            plt.close("all")
             try:
                 c_image = create_current_image(forecast.get_current_weather(), forecast.provider_name)
                 d_image = create_daily_image(forecast.get_daily_data())
@@ -101,11 +100,13 @@ def main():
                 )
 
                 display.paste_image(img)
-                plt.close(h_plot)
+
+                plt.close("all")
 
             except Exception:
                 error_img = create_error_image(error_text=traceback.format_exc())
                 display.paste_image(error_img)
+                print(f"Error: {traceback.format_exc()}")
                 time.sleep(300)
                 continue
 

@@ -32,7 +32,7 @@ def mock_data():
         "temperature": current_temp,
         "temperature_feels_like": round(current_temp + random.uniform(-6.0, 6.0), 1),
         "rain": round(max(0.0, random.uniform(-2.0, 5.0)), 1),
-        "weather_icon_name": "04d",
+        "weather_icon_name": "11d",
         "description": "Cloudy",
     }
 
@@ -60,7 +60,7 @@ def mock_data():
         {
             "time": base + timedelta(hours=h),
             "temperature": round(midpoint + amplitude * math.sin(h / 3.0 + phase), 1),
-            "rain": round(max(0.0, random.uniform(-1.0, 6.0) * math.sin(h / 2.0)), 1),
+            "rain": round(max(0.0, random.uniform(0, 2.75) * math.sin(h / 2.0)), 1),
         }
         for h in range(24)
     ]
