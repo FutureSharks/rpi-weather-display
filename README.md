@@ -10,7 +10,7 @@ Notable dependencies are:
 2. A wrapper around the OpenWeatherMap web API: [github.com/csparpa/pyowm](https://github.com/csparpa/pyowm)
 3. Weather icons: [github.com/erikflowers/weather-icons](https://github.com/erikflowers/weather-icons)
 
-There is also a CAD model of an enclosure that can be 3D printed: [enclosure.stl](enclosure.stl)
+There is also a Fusion 360 model of an enclosure that can be 3D printed: [enclosure.f3d](enclosure.f3d)
 
 Currently 3 weather providers are supported:
 
