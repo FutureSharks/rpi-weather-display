@@ -22,7 +22,7 @@ Currently 3 weather providers are supported:
 
 Example display image:
 
-<img src="https://raw.githubusercontent.com/FutureSharks/rpi-weather-display/master/img/display-example.png" width="800">
+![complete](img/display-example.png)
 
 Photo of completed unit:
 

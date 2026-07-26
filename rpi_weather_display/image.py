@@ -92,8 +92,8 @@ def create_forecast_image(
 
     # Hairline dividers between the three bands
     d = ImageDraw.Draw(img)
-    d.line([(MARGIN + 20, DAILY_Y - 4), (width - MARGIN - 20, DAILY_Y - 4)], fill=RULE, width=2)
-    d.line([(MARGIN + 20, PLOT_Y - 4), (width - MARGIN - 20, PLOT_Y - 4)], fill=RULE, width=2)
+    d.line([(0, DAILY_Y - 4), (300, DAILY_Y - 4)], fill=RULE, width=3)
+    d.line([(0, PLOT_Y - 4), (300, PLOT_Y - 4)], fill=RULE, width=3)
 
     return img.rotate(rotate)
 
