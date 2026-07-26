@@ -10,19 +10,19 @@ Notable dependencies are:
 2. A wrapper around the OpenWeatherMap web API: [github.com/csparpa/pyowm](https://github.com/csparpa/pyowm)
 3. Weather icons: [github.com/erikflowers/weather-icons](https://github.com/erikflowers/weather-icons)
 
-There is also a CAD model of an enclosure that can be 3D printed: [enclosure.stl](enclosure.stl)
+There is also a Fusion 360 model of an enclosure that can be 3D printed: [enclosure.f3d](enclosure.f3d)
 
 Currently 3 weather providers are supported:
 
+- [open-meteo.com](https://open-meteo.com/) - Completely free, no API key required
 - [openweathermap.org/api](https://openweathermap.org/api) - Free tier requires API key
 - [tomorrow.io/weather-api](https://www.tomorrow.io/weather-api/) - Free tier requires API key
-- [open-meteo.com](https://open-meteo.com/) - Completely free, no API key required
 
 ## Photos
 
 Example display image:
 
-<img src="https://raw.githubusercontent.com/FutureSharks/rpi-weather-display/master/img/display-example.png" width="800">
+![complete](img/display-example.png)
 
 Photo of completed unit:
 

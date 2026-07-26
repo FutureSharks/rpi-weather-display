@@ -2,6 +2,7 @@ import logging
 import time
 from datetime import datetime, timezone
 import requests
+import pandas as pd
 
 
 logger = logging.getLogger()
@@ -10,12 +11,13 @@ class tomorrow(object):
     """
     An interface to Tomorrow.io API
     """
-    def __init__(self, lat, long, api_key):
+    def __init__(self, lat, long, time_zone_name, api_key):
         self.provider_name = "Tomorrow.io"
         self.cache_age = 120
         self.last_forecast_update = 0
         self.lat = lat
         self.long = long
+        self.time_zone_name = time_zone_name
         self.api_key = api_key
         self.api_endpoint = "https://api.tomorrow.io/v4/timelines"
         self.default_query_string = {
@@ -49,8 +51,9 @@ class tomorrow(object):
         """
         Simply returns a 'd' or 'n' depending on whether it's day or night right now
         """
-        hour = datetime.now(timezone.utc).astimezone().hour
-        month = datetime.now(timezone.utc).astimezone().month
+        now = datetime.now(timezone.utc).astimezone()
+        hour = now.hour
+        month = now.month
 
         if month in [10, 11, 12, 1, 2, 3]:
             if hour in [18, 19, 20, 21, 22, 23, 0, 1, 2, 3, 4, 5, 6]:
@@ -90,9 +93,9 @@ class tomorrow(object):
         else:
             raise Exception(f"Uknown weatherCodeFullDay from Tomorrow: {weatherCode}")
 
-        icon_path = f"{code}d"
+        icon_code = f"{code}d"
 
-        return icon_path, description
+        return icon_code, description
 
     def _map_current_weather_icon_name(self, weatherCode):
         """
@@ -149,9 +152,9 @@ class tomorrow(object):
         else:
             raise Exception(f"Uknown weatherCode from Tomorrow: {weatherCode}")
 
-        icon_path = f"{code}{self._day_or_night_now()}"
+        icon_code = f"{code}{self._day_or_night_now()}"
 
-        return icon_path, description
+        return icon_code, description
 
     def update_forcast(self):
         """
@@ -203,6 +206,17 @@ class tomorrow(object):
 
         return results
 
+    def _prepare_hourly_data(self, data):
+        """
+        Prepares the list of data items into a basic dataframe with TZ adjusted
+        """
+        df = pd.DataFrame(data)
+        df["time"] = pd.to_datetime(df["time"], utc=True)
+        df["time"] = df["time"].dt.tz_convert(self.time_zone_name)
+        df.set_index("time", inplace=True, drop=True)
+
+        return df
+
     def get_hourly_data(self, hours=24):
         """
         Returns a list of hourly rain and temperature values
@@ -218,7 +232,7 @@ class tomorrow(object):
             h["rain"] = hour["values"].get("rainIntensity", 0)
             results.append(h)
 
-        return results
+        return self._prepare_hourly_data(results)
 
     def get_current_weather(self):
         """

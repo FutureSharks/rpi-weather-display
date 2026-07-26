@@ -4,55 +4,66 @@ Render a preview PNG of the display image using mock data, without any e-ink
 hardware. Useful for iterating on the layout in rpi_weather_display/image.py.
 
 Usage:
-    python3 preview.py            # writes preview.png next to this script
-    python3 preview.py out.png    # writes to a custom path
+    python3 preview.py                  # writes preview.png next to this script
+    python3 preview.py out.png          # writes to a custom path
+    python3 preview.py --error          # writes preview.png with an error overlay
+    python3 preview.py --error out.png  # writes to a custom path with an error overlay
 """
 
+import argparse
 import math
 import os
-import sys
+import random
 from datetime import datetime, timedelta
 
+import pandas as pd
 import matplotlib
 matplotlib.use("Agg")
 
 from rpi_weather_display.image import (
     create_current_image,
     create_daily_image,
-    create_hourly_plot,
+    create_hourly_image,
     create_forecast_image,
-    convert_plt_fig_to_pil,
+    create_error_image,
 )
 
 
 def mock_data():
+    current_temp = round(random.uniform(-15.0, 35.0), 1)
     current = {
-        "temperature": 6.6,
-        "temperature_feels_like": 4.2,
-        "rain": 0.0,
-        "weather_icon_name": "04d",
+        "temperature": current_temp,
+        "temperature_feels_like": round(current_temp + random.uniform(-6.0, 6.0), 1),
+        "rain": round(max(0.0, random.uniform(-2.0, 5.0)), 1),
+        "weather_icon_name": "11d",
         "description": "Cloudy",
     }
 
     icons = ["01d", "02d", "09d", "01d", "13d", "50d", "11d"]
-    daily = [
-        {
-            "time": datetime.today() + timedelta(days=i),
-            "temperature_max": 7 - i,
-            "temperature_min": 3 - i,
-            "rain": round(0.3 * i, 1),
-            "weather_icon_name": icons[i],
-        }
-        for i in range(7)
-    ]
+    daily = []
+    for i in range(7):
+        temp_max = round(random.uniform(-20.0, 40.0), 1)
+        temp_min = round(temp_max - random.uniform(2.0, 15.0), 1)
+        daily.append(
+            {
+                "time": datetime.today() + timedelta(days=i),
+                "temperature_max": temp_max,
+                "temperature_min": temp_min,
+                "rain": round(max(0.0, random.uniform(-3.0, 10.0)), 1),
+                "weather_icon_name": random.choice(icons),
+            }
+        )
 
     # On-the-hour timestamps so they align to the 1-minute resample grid
     base = datetime.now().replace(minute=0, second=0, microsecond=0).astimezone()
+    amplitude = random.uniform(5.0, 25.0)
+    midpoint = random.uniform(-10.0, 30.0)
+    phase = random.uniform(0, 2 * math.pi)
     hourly = [
         {
             "time": base + timedelta(hours=h),
-            "temperature": 6 + 2.5 * math.sin(h / 3.0),
-            "rain": max(0.0, 0.4 * math.sin(h / 2.0)),
+            "temperature": round(midpoint + amplitude * math.sin(h / 3.0 + phase), 1),
+            "rain": round(max(0.0, random.uniform(0, 2.75) * math.sin(h / 2.0)), 1),
         }
         for h in range(24)
     ]
@@ -60,17 +71,39 @@ def mock_data():
 
 
 def main():
-    out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("out", nargs="?", help="Output path for the preview PNG")
+    parser.add_argument(
+        "--error",
+        action="store_true",
+        help="Overlay a mock error onto the hourly-plot band, as shown when a forecast update fails",
+    )
+    args = parser.parse_args()
+
+    out = args.out or os.path.join(
         os.path.dirname(os.path.abspath(__file__)), "preview.png"
     )
     current, daily, hourly = mock_data()
 
+    # Convert hourly list to DataFrame (same format as providers return)
+    hourly_df = pd.DataFrame(hourly)
+    hourly_df["time"] = pd.to_datetime(hourly_df["time"])
+    hourly_df.set_index("time", inplace=True)
+
     img = create_forecast_image(
-        hourly=convert_plt_fig_to_pil(create_hourly_plot(hourly)),
+        hourly=create_hourly_image(hourly_df),
         daily=create_daily_image(daily),
         current=create_current_image(current, "Tomorrow.io"),
         rotate=0,
     )
+
+    if args.error:
+        img = create_error_image(
+            error_text="Traceback (most recent call last):\nConnectionError: timed out",
+            base=img,
+            rotate=0,
+        )
+
     img.save(out)
     print(f"Saved {out} ({img.size[0]}x{img.size[1]}, mode {img.mode})")
 
